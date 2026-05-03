@@ -1,4 +1,10 @@
-export type AccountType = 'checking' | 'savings' | 'credit_card' | string;
+export type AccountType =
+  | 'checking'
+  | 'savings'
+  | 'credit_card'
+  | 'cash'
+  | 'other'
+  | string;
 
 export type FinanceAccount = {
   id: string;
@@ -17,6 +23,10 @@ export type AccountsResponse = {
   data: FinanceAccount[];
 };
 
+export type AccountResponse = {
+  data: FinanceAccount;
+};
+
 export type CreateAccountInput = {
   name: string;
   type: string;
@@ -26,6 +36,11 @@ export type CreateAccountInput = {
   notes?: string;
 };
 
-export type AccountResponse = {
-  data: FinanceAccount;
+export type UpdateAccountInput = {
+  name: string;
+  type: string;
+  institution?: string;
+  currentBalanceCents: number;
+  isActive: boolean;
+  notes?: string;
 };

@@ -12,8 +12,18 @@ import { AppCard } from '../../../components/AppCard';
 import { Screen } from '../../../components/Screen';
 import { PaymentCard } from '../components/PaymentCard';
 import { usePaymentsQuery } from '../api/payments.api';
+import { CompositeScreenProps } from '@react-navigation/native';
+import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { FinanceStackParamList } from '../navigation/FinanceStack';
+import { FinanceTabParamList } from '../navigation/FinanceTabs';
 
-export function PaymentsScreen() {
+type Props = CompositeScreenProps<
+  BottomTabScreenProps<FinanceTabParamList, 'Payments'>,
+  NativeStackScreenProps<FinanceStackParamList>
+>;
+
+export function PaymentsScreen({ navigation }: Props) {
   const { data, isLoading, error, refetch, isRefetching } = usePaymentsQuery();
 
   const payments = data?.data ?? [];
@@ -53,7 +63,15 @@ export function PaymentsScreen() {
         ) : (
           <View style={styles.list}>
             {payments.map(payment => (
-              <PaymentCard key={payment.id} payment={payment} />
+              <PaymentCard
+                key={payment.id}
+                payment={payment}
+                onPress={() =>
+                  navigation.navigate('PaymentDetails', {
+                    paymentId: payment.id,
+                  })
+                }
+              />
             ))}
           </View>
         )}

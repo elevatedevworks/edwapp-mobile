@@ -19,6 +19,10 @@ export type PaymentsResponse = {
   data: Payment[];
 };
 
+export type PaymentResponse = {
+  data: Payment;
+};
+
 export type CreatePaymentInput = {
   accountId: string;
   billId: string;
@@ -30,6 +34,13 @@ export type CreatePaymentInput = {
   notes?: string;
 };
 
-export type PaymentResponse = {
-  data: Payment;
+export type UpdatePaymentInput = {
+  accountId?: string;
+  billId?: string;
+  amountCents: number;
+  paymentDate: string;
+  direction: 'inflow' | 'outflow';
+  method: string;
+  reference?: string;
+  notes?: string;
 };

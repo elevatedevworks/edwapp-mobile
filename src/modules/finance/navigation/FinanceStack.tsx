@@ -6,6 +6,10 @@ import { CreatePaymentScreen } from '../screens/CreatePaymentScreen';
 import { CreateBillScreen } from '../screens/CreateBillScreen';
 import { CreateAccountScreen } from '../screens/CreateAccountScreen';
 import { EditBillScreen } from '../screens/EditBillScreen';
+import { AccountDetailsScreen } from '../screens/AccountDetailsScreen';
+import { EditAccountScreen } from '../screens/EditAccountScreen';
+import { PaymentDetailsScreen } from '../screens/PaymentDetailsScreen';
+import { EditPaymentScreen } from '../screens/EditPaymentScreen';
 
 export type FinanceStackParamList = {
   FinanceTabs: undefined;
@@ -21,6 +25,18 @@ export type FinanceStackParamList = {
   CreateAccount: undefined;
   EditBill: {
     billId: string;
+  };
+  AccountDetails: {
+    accountId: string;
+  };
+  EditAccount: {
+    accountId: string;
+  };
+  PaymentDetails: {
+    paymentId: string;
+  };
+  EditPayment: {
+    paymentId: string;
   };
 };
 
@@ -58,6 +74,26 @@ export function FinanceStack() {
         name="EditBill"
         component={EditBillScreen}
         options={{ title: 'Edit Bill' }}
+      />
+      <Stack.Screen
+        name="AccountDetails"
+        component={AccountDetailsScreen}
+        options={{ title: 'Account Details' }}
+      />
+      <Stack.Screen
+        name="EditAccount"
+        component={EditAccountScreen}
+        options={{ title: 'Edit Account' }}
+      />
+      <Stack.Screen
+        name="PaymentDetails"
+        component={PaymentDetailsScreen}
+        options={{ title: 'Payment Details' }}
+      />
+      <Stack.Screen
+        name="EditPayment"
+        component={EditPaymentScreen}
+        options={{ title: 'Edit Payment' }}
       />
     </Stack.Navigator>
   );

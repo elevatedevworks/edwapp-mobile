@@ -4,6 +4,7 @@ import {
   AccountResponse,
   AccountsResponse,
   CreateAccountInput,
+  UpdateAccountInput,
 } from '../types/account.types';
 
 export function useAccountsQuery() {
@@ -12,6 +13,17 @@ export function useAccountsQuery() {
   return useQuery({
     queryKey: ['finance', 'accounts'],
     queryFn: () => authenticatedRequest<AccountsResponse>('/finance/accounts'),
+  });
+}
+
+export function useAccountQuery(accountId: string) {
+  const { authenticatedRequest } = useAuthenticatedApi();
+
+  return useQuery({
+    queryKey: ['finance', 'accounts', accountId],
+    queryFn: () =>
+      authenticatedRequest<AccountResponse>(`/finance/accounts/${accountId}`),
+    enabled: Boolean(accountId),
   });
 }
 
@@ -30,6 +42,28 @@ export function useCreateAccountMutation() {
         queryClient.invalidateQueries({ queryKey: ['finance', 'accounts'] }),
         queryClient.invalidateQueries({ queryKey: ['finance', 'summary'] }),
       ]);
+    },
+  });
+}
+
+export function useUpdateAccountMutation(accountId: string) {
+  const { authenticatedRequest } = useAuthenticatedApi();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (values: UpdateAccountInput) =>
+      authenticatedRequest<AccountResponse>(`/finance/accounts/${accountId}`, {
+        method: 'PATCH',
+        body: values,
+      }),
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['finance', 'accounts'] }),
+        queryClient.invalidateQueries({
+          queryKey: ['finance', 'accounts', accountId],
+        }),
+      ]),
+        queryClient.invalidateQueries({ queryKey: ['finance', 'summary'] });
     },
   });
 }

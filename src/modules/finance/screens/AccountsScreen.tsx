@@ -68,7 +68,15 @@ export function AccountsScreen({ navigation }: Props) {
         ) : (
           <View style={styles.list}>
             {accounts.map(account => (
-              <AccountCard key={account.id} account={account} />
+              <AccountCard
+                key={account.id}
+                account={account}
+                onPress={() =>
+                  navigation.navigate('AccountDetails', {
+                    accountId: account.id,
+                  })
+                }
+              />
             ))}
           </View>
         )}

@@ -1,38 +1,43 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { AppCard } from '../../../components/AppCard';
 import { formatCentsAsCurrency } from '../../../utils/formatCurrency';
 import { FinanceAccount } from '../types/account.types';
 
 type AccountCardProps = {
   account: FinanceAccount;
+  onPress?: () => void;
 };
 
-export function AccountCard({ account }: AccountCardProps) {
+export function AccountCard({ account, onPress }: AccountCardProps) {
   return (
-    <AppCard style={styles.card}>
-      <View style={styles.header}>
-        <View style={styles.titleGroup}>
-          <Text style={styles.title}>{account.name}</Text>
+    <Pressable onPress={onPress}>
+      <AppCard style={styles.card}>
+        <View style={styles.header}>
+          <View style={styles.titleGroup}>
+            <Text style={styles.title}>{account.name}</Text>
 
-          <Text style={styles.meta}>
-            {account.institution ? `${account.institution} • ` : ''}
-            {account.type}
-          </Text>
+            <Text style={styles.meta}>
+              {account.institution ? `${account.institution} • ` : ''}
+              {account.type}
+            </Text>
+          </View>
+
+          <View style={styles.balanceGroup}>
+            <Text style={styles.balance}>
+              {formatCentsAsCurrency(account.currentBalanceCents)}
+            </Text>
+            <Text style={account.isActive ? styles.active : styles.inactive}>
+              {account.isActive ? 'Active' : 'Inactive'}
+            </Text>
+          </View>
         </View>
 
-        <View style={styles.balanceGroup}>
-          <Text style={styles.balance}>
-            {formatCentsAsCurrency(account.currentBalanceCents)}
-          </Text>
-          <Text style={account.isActive ? styles.active : styles.inactive}>
-            {account.isActive ? 'Active' : 'Inactive'}
-          </Text>
-        </View>
-      </View>
-
-      {account.notes ? <Text style={styles.notes}>{account.notes}</Text> : null}
-    </AppCard>
+        {account.notes ? (
+          <Text style={styles.notes}>{account.notes}</Text>
+        ) : null}
+      </AppCard>
+    </Pressable>
   );
 }
 
