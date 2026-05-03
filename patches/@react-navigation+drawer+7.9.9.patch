@@ -1,0 +1,8 @@
+diff --git a/node_modules/@react-navigation/drawer/lib/module/views/assets/toggle-drawer-icon@2x.png b/node_modules/@react-navigation/drawer/lib/module/views/assets/toggle-drawer-icon@2x.png
+new file mode 100644
+index 0000000..35daf29
+Binary files /dev/null and b/node_modules/@react-navigation/drawer/lib/module/views/assets/toggle-drawer-icon@2x.png differ
+diff --git a/node_modules/@react-navigation/drawer/lib/module/views/assets/toggle-drawer-icon@3x.png b/node_modules/@react-navigation/drawer/lib/module/views/assets/toggle-drawer-icon@3x.png
+new file mode 100644
+index 0000000..f629dc5
+Binary files /dev/null and b/node_modules/@react-navigation/drawer/lib/module/views/assets/toggle-drawer-icon@3x.png differ

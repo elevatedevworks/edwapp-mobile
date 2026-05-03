@@ -1,4 +1,10 @@
-export const API_BASE_URL = 'https://edwapp-api.elevatedw.com';
+import Config from 'react-native-config';
+
+export const API_BASE_URL = Config.API_BASE_URL;
+
+if (!API_BASE_URL) {
+  throw new Error('API_BASE_URL is not configured');
+}
 
 export class ApiError extends Error {
   status: number;

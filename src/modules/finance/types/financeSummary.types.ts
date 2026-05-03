@@ -42,7 +42,7 @@ export type UpcomingReminder = {
   updatedAt: string;
 };
 
-export type DashboardSummaryResponse = {
+export type FinanceSummaryResponse = {
   data: {
     accounts: AccountSummary;
     bills: BillSummary;

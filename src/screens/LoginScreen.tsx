@@ -1,5 +1,12 @@
 import React from 'react';
-import { Text, StyleSheet, View } from 'react-native';
+import {
+  Text,
+  StyleSheet,
+  View,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+} from 'react-native';
 import { Screen } from '../components/Screen';
 import { AppTextInput } from '../components/AppTextInput';
 import { AppCard } from '../components/AppCard';
@@ -43,62 +50,74 @@ export function LoginScreen() {
   }
   return (
     <Screen>
-      <View style={styles.content}>
-        <View style={styles.header}>
-          <Text style={styles.title}>EDW Mobile</Text>
-          <Text style={styles.subtitle}>Sign in to continue</Text>
-        </View>
+      <KeyboardAvoidingView
+        style={styles.keyboardView}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={styles.header}>
+            <Text style={styles.title}>EDW Mobile</Text>
+            <Text style={styles.subtitle}>Sign in to continue</Text>
+          </View>
 
-        <AppCard style={styles.card}>
-          <Controller
-            control={control}
-            name="email"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <AppTextInput
-                label="Email"
-                placeholder="you@example.com"
-                autoCapitalize="none"
-                keyboardType="email-address"
-                value={value}
-                onBlur={onBlur}
-                onChangeText={onChange}
-                error={errors.email?.message}
-              />
-            )}
-          />
+          <AppCard style={styles.card}>
+            <Controller
+              control={control}
+              name="email"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <AppTextInput
+                  label="Email"
+                  placeholder="you@example.com"
+                  autoCapitalize="none"
+                  keyboardType="email-address"
+                  value={value}
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  error={errors.email?.message}
+                />
+              )}
+            />
 
-          <Controller
-            control={control}
-            name="password"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <AppTextInput
-                label="Password"
-                placeholder="Enter your password"
-                secureTextEntry
-                value={value}
-                onBlur={onBlur}
-                onChangeText={onChange}
-                error={errors.password?.message}
-              />
-            )}
-          />
+            <Controller
+              control={control}
+              name="password"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <AppTextInput
+                  label="Password"
+                  placeholder="Enter your password"
+                  secureTextEntry
+                  value={value}
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  error={errors.password?.message}
+                />
+              )}
+            />
 
-          <AppButton
-            title="Sign In"
-            onPress={handleSubmit(onSubmit)}
-            isLoading={isSubmitting}
-          />
-        </AppCard>
-      </View>
+            <AppButton
+              title="Sign In"
+              onPress={handleSubmit(onSubmit)}
+              isLoading={isSubmitting}
+            />
+          </AppCard>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  content: {
+  keyboardView: {
     flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
     justifyContent: 'center',
     paddingHorizontal: 24,
+    paddingVertical: 32,
   },
   header: {
     marginBottom: 24,
