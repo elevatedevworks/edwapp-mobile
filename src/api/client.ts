@@ -42,6 +42,7 @@ export async function apiRequest<TResponse>(
   const json = await response.json().catch(() => null);
 
   if (!response.ok) {
+    console.log(response);
     const message =
       json?.message ||
       json?.error ||

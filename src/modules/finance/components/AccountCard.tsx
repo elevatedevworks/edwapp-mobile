@@ -19,7 +19,7 @@ export function AccountCard({ account, onPress }: AccountCardProps) {
 
             <Text style={styles.meta}>
               {account.institution ? `${account.institution} • ` : ''}
-              {account.type}
+              {account.type === 'credit_card' ? 'Credit Card' : account.type}
             </Text>
           </View>
 

@@ -26,7 +26,7 @@ export function BillDetailsScreen({ route, navigation }: Props) {
   const bill = data?.data;
 
   return (
-    <Screen>
+    <Screen headerTitle="Bill Details">
       <ScrollView
         contentContainerStyle={styles.content}
         refreshControl={
@@ -74,8 +74,9 @@ export function BillDetailsScreen({ route, navigation }: Props) {
                 onPress={() =>
                   navigation.navigate('CreatePayment', {
                     billId: bill.id,
-                    accountId: bill.accountId!,
-                    amountDueCents: bill.amountDueCents,
+                    defaultAccountId: bill.accountId!,
+                    amountCents: bill.amountDueCents,
+                    direction: 'outflow',
                   })
                 }
               />

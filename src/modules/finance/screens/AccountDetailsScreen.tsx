@@ -12,7 +12,7 @@ import { AppButton } from '../../../components/AppButton';
 import { AppCard } from '../../../components/AppCard';
 import { Screen } from '../../../components/Screen';
 import { formatCentsAsCurrency } from '../../../utils/formatCurrency';
-import { formatDisplayDate } from '../../../utils/formatDate';
+// import { formatDisplayDate } from '../../../utils/formatDate';
 import { useAccountQuery } from '../api/accounts.api';
 import { FinanceStackParamList } from '../navigation/FinanceStack';
 
@@ -26,7 +26,7 @@ export function AccountDetailsScreen({ route, navigation }: Props) {
   const account = data?.data;
 
   return (
-    <Screen>
+    <Screen headerTitle="Account Details">
       <ScrollView
         contentContainerStyle={styles.content}
         refreshControl={
@@ -48,7 +48,8 @@ export function AccountDetailsScreen({ route, navigation }: Props) {
             <View style={styles.header}>
               <Text style={styles.title}>{account.name}</Text>
               <Text style={styles.subtitle}>
-                {account.institution ?? 'No institution'} • {account.type}
+                {account.institution ?? 'No institution'} •{' '}
+                {account.type === 'credit_card' ? 'Credit Card' : account.type}
               </Text>
             </View>
 
@@ -57,13 +58,28 @@ export function AccountDetailsScreen({ route, navigation }: Props) {
               <Text style={styles.balance}>
                 {formatCentsAsCurrency(account.currentBalanceCents)}
               </Text>
+
+              {account.creditLimitCents ? (
+                <View style={styles.availableBalanceContainer}>
+                  <Text style={styles.label}>Current Available Balance</Text>
+                  <Text style={styles.availableBalance}>
+                    {formatCentsAsCurrency(
+                      (account.creditLimitCents ?? 0) -
+                        (account.currentBalanceCents ?? 0),
+                    )}
+                  </Text>
+                </View>
+              ) : null}
             </AppCard>
 
             <AppButton
-              title="Edit Account"
+              title="Add Income"
               onPress={() =>
-                navigation.navigate('EditAccount', {
-                  accountId: account.id,
+                navigation.navigate('CreatePayment', {
+                  defaultAccountId: account.id,
+                  billId: null,
+                  amountCents: undefined,
+                  direction: 'inflow',
                 })
               }
             />
@@ -71,7 +87,12 @@ export function AccountDetailsScreen({ route, navigation }: Props) {
             <AppCard style={styles.section}>
               <Text style={styles.sectionTitle}>Account Info</Text>
 
-              <InfoRow label="Type" value={account.type} />
+              <InfoRow
+                label="Type"
+                value={
+                  account.type === 'credit_card' ? 'Credit Card' : account.type
+                }
+              />
               <InfoRow
                 label="Institution"
                 value={account.institution ?? 'Not set'}
@@ -89,17 +110,14 @@ export function AccountDetailsScreen({ route, navigation }: Props) {
               </AppCard>
             ) : null}
 
-            <AppCard style={styles.section}>
-              <Text style={styles.sectionTitle}>Recordkeeping</Text>
-              <InfoRow
-                label="Created"
-                value={formatDisplayDate(account.createdAt)}
-              />
-              <InfoRow
-                label="Updated"
-                value={formatDisplayDate(account.updatedAt)}
-              />
-            </AppCard>
+            <AppButton
+              title="Edit Account"
+              onPress={() =>
+                navigation.navigate('EditAccount', {
+                  accountId: account.id,
+                })
+              }
+            />
           </>
         ) : null}
       </ScrollView>
@@ -155,6 +173,15 @@ const styles = StyleSheet.create({
   balance: {
     fontSize: 32,
     fontWeight: '800',
+    color: '#0F172A',
+  },
+  availableBalanceContainer: {
+    paddingTop: 10,
+  },
+  availableBalance: {
+    paddingTop: 4,
+    fontSize: 20,
+    fontWeight: '600',
     color: '#0F172A',
   },
   section: {

@@ -25,7 +25,7 @@ export type PaymentResponse = {
 
 export type CreatePaymentInput = {
   accountId: string;
-  billId: string;
+  billId?: string | null;
   amountCents: number;
   paymentDate: string;
   direction: 'inflow' | 'outflow';
