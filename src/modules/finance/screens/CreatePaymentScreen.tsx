@@ -17,13 +17,15 @@ import { AppButton } from '../../../components/AppButton';
 import { AppCard } from '../../../components/AppCard';
 import { AppTextInput } from '../../../components/AppTextInput';
 import { Screen } from '../../../components/Screen';
-import { formatCentsAsCurrency } from '../../../utils/formatCurrency';
 import { useCreatePaymentMutation } from '../api/payments.api';
 import { FinanceStackParamList } from '../navigation/FinanceStack';
+import { useAccountsQuery } from '../api/accounts.api';
+import { AppSelect } from '../../../components/AppSelect';
 
 type Props = NativeStackScreenProps<FinanceStackParamList, 'CreatePayment'>;
 
 const createPaymentSchema = z.object({
+  accountId: z.string().min(1, 'Account is required'),
   amount: z.string().min(1, 'Amount is required'),
   paymentDate: z.string().min(1, 'Payment date is required'),
   method: z.string().min(1, 'Method is required'),
@@ -54,8 +56,16 @@ function getTodayDateString() {
 }
 
 export function CreatePaymentScreen({ route, navigation }: Props) {
-  const { billId, accountId, amountDueCents } = route.params;
+  const {
+    billId,
+    defaultAccountId,
+    amountCents: initialAmountCents,
+    direction,
+  } = route.params;
   const createPaymentMutation = useCreatePaymentMutation();
+  const { data: accountsData, isLoading: isAccountsLoading } =
+    useAccountsQuery();
+  const accounts = accountsData?.data ?? [];
 
   const {
     control,
@@ -65,9 +75,10 @@ export function CreatePaymentScreen({ route, navigation }: Props) {
   } = useForm<CreatePaymentFormValues>({
     resolver: zodResolver(createPaymentSchema),
     defaultValues: {
-      amount: (amountDueCents / 100).toFixed(2),
+      accountId: defaultAccountId ?? '',
+      amount: initialAmountCents ? (initialAmountCents / 100).toFixed(2) : '',
       paymentDate: getTodayDateString(),
-      method: 'cash',
+      method: direction === 'inflow' ? 'deposit' : 'cash',
       reference: '',
       notes: '',
     },
@@ -84,11 +95,11 @@ export function CreatePaymentScreen({ route, navigation }: Props) {
     }
 
     await createPaymentMutation.mutateAsync({
-      accountId,
-      billId,
+      accountId: values.accountId,
+      billId: billId ?? null,
       amountCents,
       paymentDate: values.paymentDate,
-      direction: 'outflow',
+      direction,
       method: values.method.trim(),
       reference: values.reference?.trim() || undefined,
       notes: values.notes?.trim() || undefined,
@@ -98,7 +109,7 @@ export function CreatePaymentScreen({ route, navigation }: Props) {
   }
 
   return (
-    <Screen>
+    <Screen headerTitle="Create Payment">
       <KeyboardAvoidingView
         style={styles.keyboardView}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -109,9 +120,13 @@ export function CreatePaymentScreen({ route, navigation }: Props) {
             keyboardShouldPersistTaps="handled"
           >
             <View style={styles.header}>
-              <Text style={styles.title}>Record Payment</Text>
+              <Text style={styles.title}>
+                {direction === 'inflow' ? 'Add Income' : 'Record Payment'}
+              </Text>
               <Text style={styles.subtitle}>
-                Default amount: {formatCentsAsCurrency(amountDueCents)}
+                {direction === 'inflow'
+                  ? 'Record income deposited into an account.'
+                  : 'Record a bill payment from an account.'}
               </Text>
             </View>
 
@@ -144,6 +159,34 @@ export function CreatePaymentScreen({ route, navigation }: Props) {
                     onBlur={onBlur}
                     onChangeText={onChange}
                     error={errors.paymentDate?.message}
+                  />
+                )}
+              />
+
+              <Controller
+                control={control}
+                name="accountId"
+                render={({ field: { onChange, value } }) => (
+                  <AppSelect
+                    label={
+                      direction === 'inflow'
+                        ? 'Deposit To Account'
+                        : 'Payment Account'
+                    }
+                    value={value}
+                    options={accounts.map(account => ({
+                      label: `${account.name} • ${
+                        account.institution ?? account.type
+                      }`,
+                      value: account.id,
+                    }))}
+                    placeholder={
+                      isAccountsLoading
+                        ? 'Loading accounts...'
+                        : 'Select account'
+                    }
+                    onChange={onChange}
+                    error={errors.accountId?.message}
                   />
                 )}
               />
@@ -206,7 +249,7 @@ export function CreatePaymentScreen({ route, navigation }: Props) {
               ) : null}
 
               <AppButton
-                title="Save Payment"
+                title={direction === 'inflow' ? 'Save Income' : 'Save Payment'}
                 onPress={handleSubmit(onSubmit)}
                 isLoading={createPaymentMutation.isPending}
               />

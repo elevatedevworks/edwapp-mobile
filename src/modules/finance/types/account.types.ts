@@ -12,6 +12,9 @@ export type FinanceAccount = {
   type: AccountType;
   institution: string | null;
   currentBalanceCents: number;
+  creditLimitCents: number | null;
+  statementClosingDay: number | null;
+  paymentDueDay: number | null;
   isActive: boolean;
   notes: string | null;
   ownerUserId: string;
@@ -32,6 +35,9 @@ export type CreateAccountInput = {
   type: string;
   institution?: string;
   currentBalanceCents: number;
+  creditLimitCents?: number;
+  statementClosingDay?: number;
+  paymentDueDay?: number;
   isActive: boolean;
   notes?: string;
 };

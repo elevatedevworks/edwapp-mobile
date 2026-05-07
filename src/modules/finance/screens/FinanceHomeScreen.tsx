@@ -11,12 +11,12 @@ import { AppButton } from '../../../components/AppButton';
 import { AppCard } from '../../../components/AppCard';
 import { Screen } from '../../../components/Screen';
 import { formatCentsAsCurrency } from '../../../utils/formatCurrency';
-import { formatDisplayDate } from '../../../utils/formatDate';
-import { useFinanceSummaryQuery } from '../api/financeSummary.api';
+// import { formatDisplayDate } from '../../../utils/formatDate';
+import { useReportsOverviewQuery } from '../api/reports.api';
 
 export function FinanceHomeScreen() {
   const { data, isLoading, error, refetch, isRefetching } =
-    useFinanceSummaryQuery();
+    useReportsOverviewQuery();
 
   const summary = data?.data;
 
@@ -69,23 +69,40 @@ export function FinanceHomeScreen() {
               </AppCard>
 
               <AppCard style={styles.statCard}>
-                <Text style={styles.statLabel}>Recent Payments</Text>
+                <Text style={styles.statLabel}>Cash Flow</Text>
                 <Text style={styles.statValue}>
-                  {summary.payments.recent.length}
+                  {formatCentsAsCurrency(summary.cashFlow.netCents)}
                 </Text>
-                <Text style={styles.statMeta}>latest activity</Text>
+                <Text style={styles.statMeta}>
+                  In: {formatCentsAsCurrency(summary.cashFlow.inflowCents)}
+                </Text>
+                <Text style={styles.statMeta}>
+                  Out: {formatCentsAsCurrency(summary.cashFlow.outflowCents)}
+                </Text>
               </AppCard>
 
               <AppCard style={styles.statCard}>
-                <Text style={styles.statLabel}>Reminders</Text>
+                <Text style={styles.statLabel}>Credit Cards</Text>
                 <Text style={styles.statValue}>
-                  {summary.reminders.upcoming.length}
+                  {formatCentsAsCurrency(
+                    summary.creditCards.totalCurrentCreditBalanceCents,
+                  )}
                 </Text>
-                <Text style={styles.statMeta}>upcoming</Text>
+                <Text style={styles.statMeta}>
+                  Avail:{' '}
+                  {formatCentsAsCurrency(
+                    summary.creditCards.totalAvailableCreditCents,
+                  )}
+                </Text>
+                <Text style={styles.statMeta}>
+                  {formatCentsAsCurrency(
+                    summary.creditCards.totalAvailableCreditCents,
+                  )}
+                </Text>
               </AppCard>
             </View>
 
-            <AppCard style={styles.section}>
+            {/* <AppCard style={styles.section}>
               <Text style={styles.sectionTitle}>Upcoming Reminders</Text>
 
               {summary.reminders.upcoming.length === 0 ? (
@@ -104,9 +121,9 @@ export function FinanceHomeScreen() {
                   </View>
                 ))
               )}
-            </AppCard>
+            </AppCard> */}
 
-            <AppCard style={styles.section}>
+            {/* <AppCard style={styles.section}>
               <Text style={styles.sectionTitle}>Recent Payments</Text>
 
               {summary.payments.recent.length === 0 ? (
@@ -137,7 +154,7 @@ export function FinanceHomeScreen() {
                   </View>
                 ))
               )}
-            </AppCard>
+            </AppCard> */}
           </>
         ) : null}
       </ScrollView>

@@ -26,7 +26,7 @@ export function PaymentDetailsScreen({ route, navigation }: Props) {
   const payment = data?.data;
 
   return (
-    <Screen>
+    <Screen headerTitle="Payment Details">
       <ScrollView
         contentContainerStyle={styles.content}
         refreshControl={

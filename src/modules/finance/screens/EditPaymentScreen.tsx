@@ -11,7 +11,7 @@ export function EditPaymentScreen({ route }: Props) {
   const { paymentId } = route.params;
 
   return (
-    <Screen>
+    <Screen headerTitle="Edit Payment">
       <View style={styles.content}>
         <View style={styles.header}>
           <Text style={styles.title}>Edit Payment</Text>

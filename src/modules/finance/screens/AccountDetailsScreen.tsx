@@ -12,7 +12,7 @@ import { AppButton } from '../../../components/AppButton';
 import { AppCard } from '../../../components/AppCard';
 import { Screen } from '../../../components/Screen';
 import { formatCentsAsCurrency } from '../../../utils/formatCurrency';
-import { formatDisplayDate } from '../../../utils/formatDate';
+// import { formatDisplayDate } from '../../../utils/formatDate';
 import { useAccountQuery } from '../api/accounts.api';
 import { FinanceStackParamList } from '../navigation/FinanceStack';
 
@@ -26,7 +26,7 @@ export function AccountDetailsScreen({ route, navigation }: Props) {
   const account = data?.data;
 
   return (
-    <Screen>
+    <Screen headerTitle="Account Details">
       <ScrollView
         contentContainerStyle={styles.content}
         refreshControl={
@@ -59,6 +59,30 @@ export function AccountDetailsScreen({ route, navigation }: Props) {
               </Text>
             </AppCard>
 
+            {account.creditLimitCents ? (
+              <AppCard style={styles.balanceCard}>
+                <Text style={styles.label}>Current Available Balance</Text>
+                <Text style={styles.balance}>
+                  {formatCentsAsCurrency(
+                    (account.creditLimitCents ?? 0) -
+                      (account.currentBalanceCents ?? 0),
+                  )}
+                </Text>
+              </AppCard>
+            ) : null}
+
+            <AppButton
+              title="Add Income"
+              onPress={() =>
+                navigation.navigate('CreatePayment', {
+                  defaultAccountId: account.id,
+                  billId: null,
+                  amountCents: undefined,
+                  direction: 'inflow',
+                })
+              }
+            />
+
             <AppButton
               title="Edit Account"
               onPress={() =>
@@ -88,18 +112,6 @@ export function AccountDetailsScreen({ route, navigation }: Props) {
                 <Text style={styles.notes}>{account.notes}</Text>
               </AppCard>
             ) : null}
-
-            <AppCard style={styles.section}>
-              <Text style={styles.sectionTitle}>Recordkeeping</Text>
-              <InfoRow
-                label="Created"
-                value={formatDisplayDate(account.createdAt)}
-              />
-              <InfoRow
-                label="Updated"
-                value={formatDisplayDate(account.updatedAt)}
-              />
-            </AppCard>
           </>
         ) : null}
       </ScrollView>

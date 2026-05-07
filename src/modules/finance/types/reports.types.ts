@@ -1,3 +1,10 @@
+export type ReportPeriod = {
+  month: number;
+  year: number;
+  startDate: string;
+  endDate: string;
+};
+
 export type AccountSummary = {
   count: number;
   totalBalanceCents: number;
@@ -5,7 +12,21 @@ export type AccountSummary = {
 
 export type BillSummary = {
   activeCount: number;
+  overdueCount: number;
+  upcomingCount: number;
   monthlyTotalCents: number;
+};
+
+export type CashFlowSummary = {
+  inflowCents: number;
+  outflowCents: number;
+  netCents: number;
+};
+
+export type CreditCardSummary = {
+  totalAvailableCreditCents: number;
+  totalCurrentCreditBalanceCents: number;
+  totalCreditLimit: number;
 };
 
 export type PaymentDirection = 'inflow' | 'outflow' | string;
@@ -42,15 +63,18 @@ export type UpcomingReminder = {
   updatedAt: string;
 };
 
-export type FinanceSummaryResponse = {
+export type ReportsOverviewResponse = {
   data: {
+    period: ReportPeriod;
     accounts: AccountSummary;
     bills: BillSummary;
-    payments: {
-      recent: RecentPayment[];
-    };
-    reminders: {
-      upcoming: UpcomingReminder[];
-    };
+    cashFlow: CashFlowSummary;
+    creditCards: CreditCardSummary;
+    // payments: {
+    //   recent: RecentPayment[];
+    // };
+    // reminders: {
+    //   upcoming: UpcomingReminder[];
+    // };
   };
 };

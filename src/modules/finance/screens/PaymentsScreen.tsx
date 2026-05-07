@@ -43,6 +43,18 @@ export function PaymentsScreen({ navigation }: Props) {
           </Text>
         </View>
 
+        <AppButton
+          title="Add Income"
+          onPress={() =>
+            navigation.navigate('CreatePayment', {
+              defaultAccountId: null,
+              billId: null,
+              amountCents: undefined,
+              direction: 'inflow',
+            })
+          }
+        />
+
         {isLoading ? (
           <ActivityIndicator style={styles.loader} />
         ) : error ? (

@@ -5,13 +5,61 @@ import { BillsScreen } from '../screens/BillsScreen';
 import { FinanceHomeScreen } from '../screens/FinanceHomeScreen';
 import { PaymentsScreen } from '../screens/PaymentsScreen';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 export type FinanceTabParamList = {
   Overview: undefined;
   Bills: undefined;
   Payments: undefined;
   Accounts: undefined;
+  Reports: undefined;
 };
+
+type TabIconProps = {
+  color: string;
+  size: number;
+  focused: boolean;
+};
+
+function OverviewTabIcon({ color, size, focused }: TabIconProps) {
+  return (
+    <MaterialCommunityIcons
+      name={focused ? 'view-dashboard' : 'view-dashboard-outline'}
+      color={color}
+      size={size}
+    />
+  );
+}
+
+function AccountsTabIcon({ color, size, focused }: TabIconProps) {
+  return (
+    <MaterialCommunityIcons
+      name={focused ? 'wallet' : 'wallet-outline'}
+      color={color}
+      size={size}
+    />
+  );
+}
+
+function BillsTabIcon({ color, size, focused }: TabIconProps) {
+  return (
+    <MaterialCommunityIcons
+      name={focused ? 'file-document' : 'file-document-outline'}
+      color={color}
+      size={size}
+    />
+  );
+}
+
+// function ReportsTabIcon({ color, size, focused }: TabIconProps) {
+//   return (
+//     <MaterialCommunityIcons
+//       name={focused ? 'chart-box' : 'chart-box-outline'}
+//       color={color}
+//       size={size}
+//     />
+//   );
+// }
 
 const Tab = createBottomTabNavigator<FinanceTabParamList>();
 
@@ -35,10 +83,28 @@ export function FinanceTabs() {
         },
       }}
     >
-      <Tab.Screen name="Overview" component={FinanceHomeScreen} />
-      <Tab.Screen name="Bills" component={BillsScreen} />
+      <Tab.Screen
+        name="Overview"
+        component={FinanceHomeScreen}
+        options={{
+          tabBarIcon: OverviewTabIcon,
+        }}
+      />
+      <Tab.Screen
+        name="Bills"
+        component={BillsScreen}
+        options={{
+          tabBarIcon: BillsTabIcon,
+        }}
+      />
       <Tab.Screen name="Payments" component={PaymentsScreen} />
-      <Tab.Screen name="Accounts" component={AccountsScreen} />
+      <Tab.Screen
+        name="Accounts"
+        component={AccountsScreen}
+        options={{
+          tabBarIcon: AccountsTabIcon,
+        }}
+      />
     </Tab.Navigator>
   );
 }

@@ -43,8 +43,13 @@ export function useCreatePaymentMutation() {
         queryClient.invalidateQueries({ queryKey: ['finance', 'summary'] }),
         queryClient.invalidateQueries({ queryKey: ['finance', 'bills'] }),
         queryClient.invalidateQueries({
-          queryKey: ['finance', 'bills', variables.billId],
+          queryKey: ['finance', 'accounts', variables.accountId],
         }),
+        variables.billId
+          ? queryClient.invalidateQueries({
+              queryKey: ['finance', 'bills', variables.billId],
+            })
+          : Promise.resolve(),
       ]);
     },
   });

@@ -9,16 +9,18 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { Screen } from './Screen';
 
 type FormScreenProps = {
+  headerTitle?: string;
   children: React.ReactNode;
   contentContainerStyle?: ViewStyle;
 };
 
 export function FormScreen({
+  headerTitle,
   children,
   contentContainerStyle,
 }: FormScreenProps) {
   return (
-    <Screen>
+    <Screen headerTitle={headerTitle && headerTitle}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <KeyboardAwareScrollView
           contentContainerStyle={[styles.content, contentContainerStyle]}

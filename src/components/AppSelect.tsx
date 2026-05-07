@@ -8,6 +8,8 @@ import {
   ViewStyle,
 } from 'react-native';
 
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+
 export type SelectOption<TValue extends string> = {
   label: string;
   value: TValue;
@@ -60,6 +62,7 @@ export function AppSelect<TValue extends string>({
         >
           {selectedOption?.label ?? placeholder}
         </Text>
+        <MaterialCommunityIcons name="chevron-down" size={24} />
       </Pressable>
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
@@ -125,7 +128,7 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     borderWidth: 1,
     borderColor: '#CBD5E1',
-    backgroundColor: '#fff',
+    backgroundColor: '#eff0f3',
     paddingHorizontal: 14,
     flexDirection: 'row',
     alignItems: 'center',

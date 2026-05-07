@@ -46,14 +46,47 @@ const activeOptions: SelectOption<'true' | 'false'>[] = [
   { label: 'Inactive', value: 'false' },
 ];
 
-const createAccountSchema = z.object({
-  name: z.string().min(1, 'Account name is required'),
-  type: z.enum(accountTypeOptions),
-  institution: z.string().optional(),
-  currentBalance: z.string().min(1, 'Current balance is required'),
-  isActive: z.enum(['true', 'false']),
-  notes: z.string().optional(),
-});
+const createAccountSchema = z
+  .object({
+    name: z.string().min(1, 'Account name is required'),
+    type: z.enum(accountTypeOptions),
+    institution: z.string().optional(),
+    currentBalance: z.string().min(1, 'Current balance is required'),
+    isActive: z.enum(['true', 'false']),
+    notes: z.string().optional(),
+    creditLimit: z.string().optional(),
+    statementClosingDay: z.string().optional(),
+    paymentDueDay: z.string().optional(),
+  })
+  .superRefine((values, context) => {
+    if (values.type !== 'credit_card') {
+      return;
+    }
+
+    if (!values.creditLimit?.trim()) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['creditLimit'],
+        message: 'Credit limit is required for credit cards',
+      });
+    }
+
+    if (!values.statementClosingDay?.trim()) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['statementClosingDay'],
+        message: 'Statement closing day is required for credit cards',
+      });
+    }
+
+    if (!values.paymentDueDay?.trim()) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['paymentDueDay'],
+        message: 'Payment due day is required for credit cards',
+      });
+    }
+  });
 
 type CreateAccountFormValues = z.infer<typeof createAccountSchema>;
 
@@ -76,6 +109,7 @@ export function CreateAccountScreen({ navigation }: Props) {
     handleSubmit,
     formState: { errors },
     setError,
+    watch,
   } = useForm<CreateAccountFormValues>({
     resolver: zodResolver(createAccountSchema),
     defaultValues: {
@@ -87,6 +121,9 @@ export function CreateAccountScreen({ navigation }: Props) {
       notes: '',
     },
   });
+
+  const selectedAccountType = watch('type');
+  const isCreditCard = selectedAccountType === 'credit_card';
 
   async function onSubmit(values: CreateAccountFormValues) {
     const currentBalanceCents = dollarsToCents(values.currentBalance);
@@ -105,13 +142,28 @@ export function CreateAccountScreen({ navigation }: Props) {
       currentBalanceCents,
       isActive: values.isActive === 'true',
       notes: values.notes?.trim() || undefined,
+
+      creditLimitCents:
+        values.type === 'credit_card'
+          ? dollarsToCents(values.creditLimit ?? '') ?? undefined
+          : undefined,
+
+      statementClosingDay:
+        values.type === 'credit_card'
+          ? Number(values.statementClosingDay)
+          : undefined,
+
+      paymentDueDay:
+        values.type === 'credit_card'
+          ? Number(values.paymentDueDay)
+          : undefined,
     });
 
     navigation.goBack();
   }
 
   return (
-    <Screen>
+    <Screen headerTitle="Create Account">
       <KeyboardAvoidingView
         style={styles.keyboardView}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -135,7 +187,7 @@ export function CreateAccountScreen({ navigation }: Props) {
                 render={({ field: { onChange, onBlur, value } }) => (
                   <AppTextInput
                     label="Account Name"
-                    placeholder="Checking"
+                    placeholder="Enter Account Name"
                     value={value}
                     onBlur={onBlur}
                     onChangeText={onChange}
@@ -165,7 +217,7 @@ export function CreateAccountScreen({ navigation }: Props) {
                 render={({ field: { onChange, onBlur, value } }) => (
                   <AppTextInput
                     label="Institution"
-                    placeholder="Chase, Truliant, Capital One"
+                    placeholder="Enter Institution"
                     value={value}
                     onBlur={onBlur}
                     onChangeText={onChange}
@@ -180,7 +232,7 @@ export function CreateAccountScreen({ navigation }: Props) {
                 render={({ field: { onChange, onBlur, value } }) => (
                   <AppTextInput
                     label="Current Balance"
-                    placeholder="1250.00"
+                    placeholder="Enter balance"
                     keyboardType="decimal-pad"
                     value={value}
                     onBlur={onBlur}
@@ -189,6 +241,58 @@ export function CreateAccountScreen({ navigation }: Props) {
                   />
                 )}
               />
+
+              {isCreditCard ? (
+                <>
+                  <Controller
+                    control={control}
+                    name="creditLimit"
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <AppTextInput
+                        label="Credit Limit"
+                        placeholder="5000.00"
+                        keyboardType="decimal-pad"
+                        value={value}
+                        onBlur={onBlur}
+                        onChangeText={onChange}
+                        error={errors.creditLimit?.message}
+                      />
+                    )}
+                  />
+
+                  <Controller
+                    control={control}
+                    name="statementClosingDay"
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <AppTextInput
+                        label="Statement Closing Day"
+                        placeholder="15"
+                        keyboardType="number-pad"
+                        value={value}
+                        onBlur={onBlur}
+                        onChangeText={onChange}
+                        error={errors.statementClosingDay?.message}
+                      />
+                    )}
+                  />
+
+                  <Controller
+                    control={control}
+                    name="paymentDueDay"
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <AppTextInput
+                        label="Payment Due Day"
+                        placeholder="1"
+                        keyboardType="number-pad"
+                        value={value}
+                        onBlur={onBlur}
+                        onChangeText={onChange}
+                        error={errors.paymentDueDay?.message}
+                      />
+                    )}
+                  />
+                </>
+              ) : null}
 
               <Controller
                 control={control}

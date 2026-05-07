@@ -180,7 +180,7 @@ function EditAccountForm({
   }
 
   return (
-    <FormScreen>
+    <FormScreen headerTitle="Edit Account">
       <View style={styles.header}>
         <Text style={styles.title}>Edit Account</Text>
         <Text style={styles.subtitle}>
