@@ -21,6 +21,7 @@ import { useCreatePaymentMutation } from '../api/payments.api';
 import { FinanceStackParamList } from '../navigation/FinanceStack';
 import { useAccountsQuery } from '../api/accounts.api';
 import { AppSelect } from '../../../components/AppSelect';
+import { dollarsToCents } from '../utils/finance.utils';
 
 type Props = NativeStackScreenProps<FinanceStackParamList, 'CreatePayment'>;
 
@@ -34,17 +35,6 @@ const createPaymentSchema = z.object({
 });
 
 type CreatePaymentFormValues = z.infer<typeof createPaymentSchema>;
-
-function dollarsToCents(value: string) {
-  const normalized = value.replace(/[^0-9.]/g, '');
-  const numberValue = Number(normalized);
-
-  if (Number.isNaN(numberValue)) {
-    return null;
-  }
-
-  return Math.round(numberValue * 100);
-}
 
 function getTodayDateString() {
   const today = new Date();

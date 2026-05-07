@@ -6,7 +6,7 @@ export function useReportsOverviewQuery() {
   const { authenticatedRequest } = useAuthenticatedApi();
 
   return useQuery({
-    queryKey: ['reports', 'overview'],
+    queryKey: ['finance', 'reports', 'overview'],
     queryFn: () =>
       authenticatedRequest<ReportsOverviewResponse>(
         '/finance/reports/overview',

@@ -48,7 +48,8 @@ export function AccountDetailsScreen({ route, navigation }: Props) {
             <View style={styles.header}>
               <Text style={styles.title}>{account.name}</Text>
               <Text style={styles.subtitle}>
-                {account.institution ?? 'No institution'} • {account.type}
+                {account.institution ?? 'No institution'} •{' '}
+                {account.type === 'credit_card' ? 'Credit Card' : account.type}
               </Text>
             </View>
 
@@ -57,19 +58,19 @@ export function AccountDetailsScreen({ route, navigation }: Props) {
               <Text style={styles.balance}>
                 {formatCentsAsCurrency(account.currentBalanceCents)}
               </Text>
-            </AppCard>
 
-            {account.creditLimitCents ? (
-              <AppCard style={styles.balanceCard}>
-                <Text style={styles.label}>Current Available Balance</Text>
-                <Text style={styles.balance}>
-                  {formatCentsAsCurrency(
-                    (account.creditLimitCents ?? 0) -
-                      (account.currentBalanceCents ?? 0),
-                  )}
-                </Text>
-              </AppCard>
-            ) : null}
+              {account.creditLimitCents ? (
+                <View style={styles.availableBalanceContainer}>
+                  <Text style={styles.label}>Current Available Balance</Text>
+                  <Text style={styles.availableBalance}>
+                    {formatCentsAsCurrency(
+                      (account.creditLimitCents ?? 0) -
+                        (account.currentBalanceCents ?? 0),
+                    )}
+                  </Text>
+                </View>
+              ) : null}
+            </AppCard>
 
             <AppButton
               title="Add Income"
@@ -83,19 +84,15 @@ export function AccountDetailsScreen({ route, navigation }: Props) {
               }
             />
 
-            <AppButton
-              title="Edit Account"
-              onPress={() =>
-                navigation.navigate('EditAccount', {
-                  accountId: account.id,
-                })
-              }
-            />
-
             <AppCard style={styles.section}>
               <Text style={styles.sectionTitle}>Account Info</Text>
 
-              <InfoRow label="Type" value={account.type} />
+              <InfoRow
+                label="Type"
+                value={
+                  account.type === 'credit_card' ? 'Credit Card' : account.type
+                }
+              />
               <InfoRow
                 label="Institution"
                 value={account.institution ?? 'Not set'}
@@ -112,6 +109,15 @@ export function AccountDetailsScreen({ route, navigation }: Props) {
                 <Text style={styles.notes}>{account.notes}</Text>
               </AppCard>
             ) : null}
+
+            <AppButton
+              title="Edit Account"
+              onPress={() =>
+                navigation.navigate('EditAccount', {
+                  accountId: account.id,
+                })
+              }
+            />
           </>
         ) : null}
       </ScrollView>
@@ -167,6 +173,15 @@ const styles = StyleSheet.create({
   balance: {
     fontSize: 32,
     fontWeight: '800',
+    color: '#0F172A',
+  },
+  availableBalanceContainer: {
+    paddingTop: 10,
+  },
+  availableBalance: {
+    paddingTop: 4,
+    fontSize: 20,
+    fontWeight: '600',
     color: '#0F172A',
   },
   section: {

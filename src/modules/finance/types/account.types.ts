@@ -47,6 +47,9 @@ export type UpdateAccountInput = {
   type: string;
   institution?: string;
   currentBalanceCents: number;
+  creditLimitCents?: number;
+  statementClosingDay?: number;
+  paymentDueDay?: number;
   isActive: boolean;
   notes?: string;
 };

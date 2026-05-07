@@ -22,6 +22,7 @@ import { AppSelect, SelectOption } from '../../../components/AppSelect';
 import { AppTextInput } from '../../../components/AppTextInput';
 import { Screen } from '../../../components/Screen';
 import { FinanceAccount } from '../types/account.types';
+import { dollarsToCents } from '../utils/finance.utils';
 
 const frequencyOptions = [
   'one-time',
@@ -119,17 +120,6 @@ type BillFormProps = {
   submitError?: unknown;
   onSubmit: (values: BillFormSubmitValues) => Promise<void>;
 };
-
-function dollarsToCents(value: string) {
-  const normalized = value.replace(/[^0-9.]/g, '');
-  const numberValue = Number(normalized);
-
-  if (Number.isNaN(numberValue)) {
-    return null;
-  }
-
-  return Math.round(numberValue * 100);
-}
 
 function parseDueDay(value?: string) {
   if (!value?.trim()) {
