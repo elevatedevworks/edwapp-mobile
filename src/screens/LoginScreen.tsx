@@ -41,7 +41,6 @@ export function LoginScreen() {
   async function onSubmit(values: LoginFormValues) {
     try {
       const response = await loginRequest(values);
-      console.log(response.data);
 
       await signIn(response.data.token, response.data.user);
     } catch (error) {

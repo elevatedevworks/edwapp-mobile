@@ -89,9 +89,6 @@ export function CreateTransactionScreen({ navigation }: Props) {
       return;
     }
 
-    console.log('Values', values);
-    console.log('Amount Cents', amountCents);
-
     await createTransactionMutation.mutateAsync({
       kind: values.kind,
       accountId: values.accountId,
