@@ -10,6 +10,8 @@ import { AccountDetailsScreen } from '../screens/AccountDetailsScreen';
 import { EditAccountScreen } from '../screens/EditAccountScreen';
 import { PaymentDetailsScreen } from '../screens/PaymentDetailsScreen';
 import { EditPaymentScreen } from '../screens/EditPaymentScreen';
+import { TransactionDetailsScreen } from '../screens/TransactionDetailsScreen';
+import { CreateTransactionScreen } from '../screens/CreateTransactionScreen';
 
 export type FinanceStackParamList = {
   FinanceTabs: undefined;
@@ -39,6 +41,10 @@ export type FinanceStackParamList = {
   EditPayment: {
     paymentId: string;
   };
+  TransactionDetails: {
+    transactionId: string;
+  };
+  CreateTransaction: undefined;
 };
 
 const Stack = createNativeStackNavigator<FinanceStackParamList>();
@@ -80,6 +86,20 @@ export function FinanceStack() {
         component={EditPaymentScreen}
         options={{
           title: 'Edit Payment',
+        }}
+      />
+      <Stack.Screen
+        name="TransactionDetails"
+        component={TransactionDetailsScreen}
+        options={{
+          title: 'Transaction Details',
+        }}
+      />
+      <Stack.Screen
+        name="CreateTransaction"
+        component={CreateTransactionScreen}
+        options={{
+          title: 'Create Transaction',
         }}
       />
     </Stack.Navigator>

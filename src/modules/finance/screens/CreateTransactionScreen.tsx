@@ -1,4 +1,12 @@
 import React from 'react';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+
+import { FinanceStackParamList } from '../navigation/FinanceStack';
+import { useCreateTransactionMutation } from '../api/transactions.api';
+import z from 'zod';
+import { Controller, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { dollarsToCents, getTodayDateString } from '../utils/finance.utils';
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -9,63 +17,69 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Controller, useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { AppButton } from '../../../components/AppButton';
+import { Screen } from '../../../components/Screen';
 import { AppCard } from '../../../components/AppCard';
 import { AppTextInput } from '../../../components/AppTextInput';
-import { Screen } from '../../../components/Screen';
-import { useCreatePaymentMutation } from '../api/payments.api';
-import { FinanceStackParamList } from '../navigation/FinanceStack';
-import { useAccountsQuery } from '../api/accounts.api';
 import { AppSelect } from '../../../components/AppSelect';
-import { dollarsToCents, getTodayDateString } from '../utils/finance.utils';
+import { useAccountsQuery } from '../api/accounts.api';
+import { AppButton } from '../../../components/AppButton';
+import {
+  transactionKindOptions,
+  transactionKindSelectOptions,
+} from '../constants/transaction.constants';
 
-type Props = NativeStackScreenProps<FinanceStackParamList, 'CreatePayment'>;
+type Props = NativeStackScreenProps<FinanceStackParamList, 'CreateTransaction'>;
 
-const createPaymentSchema = z.object({
+const createTransactionSchema = z.object({
+  kind: z.enum(transactionKindOptions),
   accountId: z.string().min(1, 'Account is required'),
+  counterpartyAccountId: z.string().optional(),
+  linkedBillId: z.string().optional(),
   amount: z.string().min(1, 'Amount is required'),
-  paymentDate: z.string().min(1, 'Payment date is required'),
-  method: z.string().min(1, 'Method is required'),
-  reference: z.string().optional(),
+  transactionDate: z.string().min(1, 'Transaction date is required'),
+  description: z.string().min(1, 'Description is required'),
   notes: z.string().optional(),
 });
 
-type CreatePaymentFormValues = z.infer<typeof createPaymentSchema>;
+type CreateTransactionFormValues = z.infer<typeof createTransactionSchema>;
 
-export function CreatePaymentScreen({ route, navigation }: Props) {
-  const {
-    billId,
-    defaultAccountId,
-    amountCents: initialAmountCents,
-    direction,
-  } = route.params;
-  const createPaymentMutation = useCreatePaymentMutation();
+export function CreateTransactionScreen({ navigation }: Props) {
+  const createTransactionMutation = useCreateTransactionMutation();
+
   const { data: accountsData, isLoading: isAccountsLoading } =
     useAccountsQuery();
   const accounts = accountsData?.data ?? [];
+
+  // const { data: counterpartyAccountsData, isLoading: isCounterpartyAccountsLoading } =
+  //   useAccountsQuery();
+  // const counterpartyAccounts = counterpartyAccountsData?.data ?? [];
 
   const {
     control,
     handleSubmit,
     formState: { errors },
     setError,
-  } = useForm<CreatePaymentFormValues>({
-    resolver: zodResolver(createPaymentSchema),
+    watch,
+  } = useForm<CreateTransactionFormValues>({
+    resolver: zodResolver(createTransactionSchema),
     defaultValues: {
-      accountId: defaultAccountId ?? '',
-      amount: initialAmountCents ? (initialAmountCents / 100).toFixed(2) : '',
-      paymentDate: getTodayDateString(),
-      method: direction === 'inflow' ? 'deposit' : 'cash',
-      reference: '',
+      kind: 'expense',
+      accountId: '',
+      counterpartyAccountId: '',
+      linkedBillId: '',
+      amount: '',
+      transactionDate: getTodayDateString(),
+      description: '',
       notes: '',
     },
   });
 
-  async function onSubmit(values: CreatePaymentFormValues) {
+  const selectedTransactionKind = watch('kind');
+  const isTransfer = selectedTransactionKind === 'transfer';
+
+  const isIncome = selectedTransactionKind === 'income';
+
+  async function onSubmit(values: CreateTransactionFormValues) {
     const amountCents = dollarsToCents(values.amount);
 
     if (!amountCents || amountCents <= 0) {
@@ -75,22 +89,22 @@ export function CreatePaymentScreen({ route, navigation }: Props) {
       return;
     }
 
-    await createPaymentMutation.mutateAsync({
+    await createTransactionMutation.mutateAsync({
+      kind: values.kind,
       accountId: values.accountId,
-      billId: billId ?? null,
+      counterpartyAccountId: values.counterpartyAccountId?.trim() || undefined,
+      linkedBillId: values.linkedBillId || undefined,
       amountCents,
-      paymentDate: values.paymentDate,
-      direction,
-      method: values.method.trim(),
-      reference: values.reference?.trim() || undefined,
-      notes: values.notes?.trim() || undefined,
+      transactionDate: values.transactionDate,
+      description: values.description,
+      notes: values.notes,
     });
 
     navigation.goBack();
   }
 
   return (
-    <Screen headerTitle="Create Payment">
+    <Screen headerTitle="Create Transaction">
       <KeyboardAvoidingView
         style={styles.keyboardView}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -101,17 +115,27 @@ export function CreatePaymentScreen({ route, navigation }: Props) {
             keyboardShouldPersistTaps="handled"
           >
             <View style={styles.header}>
-              <Text style={styles.title}>
-                {direction === 'inflow' ? 'Add Income' : 'Record Payment'}
-              </Text>
+              <Text style={styles.title}>Create Transaction</Text>
               <Text style={styles.subtitle}>
-                {direction === 'inflow'
-                  ? 'Record income deposited into an account.'
-                  : 'Record a bill payment from an account.'}
+                Record a transaction (expense, income, transfer)
               </Text>
             </View>
 
             <AppCard style={styles.card}>
+              <Controller
+                control={control}
+                name="kind"
+                render={({ field: { onChange, value } }) => (
+                  <AppSelect
+                    label="Type"
+                    value={value}
+                    options={transactionKindSelectOptions}
+                    placeholder="Select transaction type"
+                    onChange={onChange}
+                    error={errors.kind?.message}
+                  />
+                )}
+              />
               <Controller
                 control={control}
                 name="amount"
@@ -130,16 +154,16 @@ export function CreatePaymentScreen({ route, navigation }: Props) {
 
               <Controller
                 control={control}
-                name="paymentDate"
+                name="transactionDate"
                 render={({ field: { onChange, onBlur, value } }) => (
                   <AppTextInput
-                    label="Payment Date"
+                    label="Transaction Date"
                     placeholder="YYYY-MM-DD"
                     autoCapitalize="none"
                     value={value}
                     onBlur={onBlur}
                     onChangeText={onChange}
-                    error={errors.paymentDate?.message}
+                    error={errors.transactionDate?.message}
                   />
                 )}
               />
@@ -149,11 +173,7 @@ export function CreatePaymentScreen({ route, navigation }: Props) {
                 name="accountId"
                 render={({ field: { onChange, value } }) => (
                   <AppSelect
-                    label={
-                      direction === 'inflow'
-                        ? 'Deposit To Account'
-                        : 'Payment Account'
-                    }
+                    label={isIncome ? 'To Account' : 'From Account'}
                     value={value}
                     options={accounts.map(account => ({
                       label: `${account.name} • ${
@@ -172,34 +192,44 @@ export function CreatePaymentScreen({ route, navigation }: Props) {
                 )}
               />
 
-              <Controller
-                control={control}
-                name="method"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <AppTextInput
-                    label="Method"
-                    placeholder="cash, card, ach, check"
-                    autoCapitalize="none"
-                    value={value}
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    error={errors.method?.message}
-                  />
-                )}
-              />
+              {isTransfer ? (
+                <Controller
+                  control={control}
+                  name="counterpartyAccountId"
+                  render={({ field: { onChange, value } }) => (
+                    <AppSelect
+                      label="Account"
+                      value={value}
+                      options={accounts.map(account => ({
+                        label: `${account.name} • ${
+                          account.institution ?? account.type
+                        }`,
+                        value: account.id,
+                      }))}
+                      placeholder={
+                        isAccountsLoading
+                          ? 'Loading accounts...'
+                          : 'Select account'
+                      }
+                      onChange={onChange}
+                      error={errors.counterpartyAccountId?.message}
+                    />
+                  )}
+                />
+              ) : null}
 
               <Controller
                 control={control}
-                name="reference"
+                name="description"
                 render={({ field: { onChange, onBlur, value } }) => (
                   <AppTextInput
-                    label="Reference"
-                    placeholder="Confirmation number"
+                    label="Description"
+                    placeholder="Enter Description"
                     autoCapitalize="none"
                     value={value}
                     onBlur={onBlur}
                     onChangeText={onChange}
-                    error={errors.reference?.message}
+                    error={errors.description?.message}
                   />
                 )}
               />
@@ -221,18 +251,17 @@ export function CreatePaymentScreen({ route, navigation }: Props) {
                 )}
               />
 
-              {createPaymentMutation.error ? (
+              {createTransactionMutation.error ? (
                 <Text style={styles.errorText}>
-                  {createPaymentMutation.error instanceof Error
-                    ? createPaymentMutation.error.message
+                  {createTransactionMutation.error instanceof Error
+                    ? createTransactionMutation.error.message
                     : 'Could not create payment'}
                 </Text>
               ) : null}
-
               <AppButton
-                title={direction === 'inflow' ? 'Save Income' : 'Save Payment'}
+                title="Create Transaction"
                 onPress={handleSubmit(onSubmit)}
-                isLoading={createPaymentMutation.isPending}
+                isLoading={createTransactionMutation.isPending}
               />
             </AppCard>
           </ScrollView>
@@ -268,9 +297,11 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   notesInput: {
-    minHeight: 96,
+    height: 96,
     textAlignVertical: 'top',
     paddingTop: 14,
+    paddingBottom: 14,
+    marginBottom: 20,
   },
   errorText: {
     color: '#991B1B',

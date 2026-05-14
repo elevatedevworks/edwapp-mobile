@@ -18,44 +18,19 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AppButton } from '../../../components/AppButton';
 import { AppCard } from '../../../components/AppCard';
-import { AppSelect, SelectOption } from '../../../components/AppSelect';
+import { AppSelect } from '../../../components/AppSelect';
 import { AppTextInput } from '../../../components/AppTextInput';
 import { Screen } from '../../../components/Screen';
 import { FinanceAccount } from '../types/account.types';
 import { dollarsToCents } from '../utils/finance.utils';
-
-const frequencyOptions = [
-  'one-time',
-  'weekly',
-  'monthly',
-  'quarterly',
-  'annual',
-] as const;
-
-export type BillFrequencyOption = (typeof frequencyOptions)[number];
-
-const frequencySelectOptions: SelectOption<BillFrequencyOption>[] = [
-  { label: 'One-time', value: 'one-time' },
-  { label: 'Weekly', value: 'weekly' },
-  { label: 'Monthly', value: 'monthly' },
-  { label: 'Quarterly', value: 'quarterly' },
-  { label: 'Annual', value: 'annual' },
-];
-
-const statusOptions: SelectOption<'active' | 'inactive'>[] = [
-  { label: 'Active', value: 'active' },
-  { label: 'Inactive', value: 'inactive' },
-];
-
-const autopayOptions: SelectOption<'true' | 'false'>[] = [
-  { label: 'No', value: 'false' },
-  { label: 'Yes', value: 'true' },
-];
-
-const activeOptions: SelectOption<'true' | 'false'>[] = [
-  { label: 'Active', value: 'true' },
-  { label: 'Inactive', value: 'false' },
-];
+import {
+  activeOptions,
+  autopayOptions,
+  BillFrequencyOption,
+  frequencyOptions,
+  frequencySelectOptions,
+  statusOptions,
+} from '../constants/bill.constants';
 
 const billFormSchema = z
   .object({
@@ -75,7 +50,7 @@ const billFormSchema = z
     if (values.frequency === 'monthly') {
       if (!values.dueDayOfMonth?.trim()) {
         context.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: 'custom',
           path: ['dueDayOfMonth'],
           message: 'Due day of month is required for monthly bills',
         });
@@ -86,7 +61,7 @@ const billFormSchema = z
 
     if (!values.dueDate?.trim()) {
       context.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: 'custom',
         path: ['dueDate'],
         message: 'Due date is required for this frequency',
       });
