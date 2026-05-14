@@ -7,7 +7,11 @@ type AppCardProps = {
 };
 
 export function AppCard({ children, style }: AppCardProps) {
-  return <View style={[styles.card, style]}>{children}</View>;
+  return (
+    <View style={[styles.card, style]}>
+      <View>{children}</View>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({

@@ -3,14 +3,15 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { AccountsScreen } from '../screens/AccountsScreen';
 import { BillsScreen } from '../screens/BillsScreen';
 import { FinanceHomeScreen } from '../screens/FinanceHomeScreen';
-import { PaymentsScreen } from '../screens/PaymentsScreen';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { TransactionsScreen } from '../screens/TransactionsScreen';
 
 export type FinanceTabParamList = {
   Overview: undefined;
   Bills: undefined;
   Payments: undefined;
+  Transactions: undefined;
   Accounts: undefined;
   Reports: undefined;
 };
@@ -51,15 +52,17 @@ function BillsTabIcon({ color, size, focused }: TabIconProps) {
   );
 }
 
-// function ReportsTabIcon({ color, size, focused }: TabIconProps) {
-//   return (
-//     <MaterialCommunityIcons
-//       name={focused ? 'chart-box' : 'chart-box-outline'}
-//       color={color}
-//       size={size}
-//     />
-//   );
-// }
+function TransactionsTabIcon({ color, size, focused }: TabIconProps) {
+  return (
+    <MaterialCommunityIcons
+      name={
+        focused ? 'swap-horizontal-circle' : 'swap-horizontal-circle-outline'
+      }
+      color={color}
+      size={size}
+    />
+  );
+}
 
 const Tab = createBottomTabNavigator<FinanceTabParamList>();
 
@@ -97,7 +100,11 @@ export function FinanceTabs() {
           tabBarIcon: BillsTabIcon,
         }}
       />
-      <Tab.Screen name="Payments" component={PaymentsScreen} />
+      <Tab.Screen
+        name="Transactions"
+        component={TransactionsScreen}
+        options={{ tabBarIcon: TransactionsTabIcon }}
+      />
       <Tab.Screen
         name="Accounts"
         component={AccountsScreen}

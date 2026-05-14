@@ -62,10 +62,10 @@ export function useUpdateAccountMutation(accountId: string) {
         queryClient.invalidateQueries({
           queryKey: ['finance', 'accounts', accountId],
         }),
-      ]),
         queryClient.invalidateQueries({
           queryKey: ['finance', 'reports', 'overview'],
-        });
+        }),
+      ]);
     },
   });
 }

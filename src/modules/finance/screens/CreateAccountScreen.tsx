@@ -17,7 +17,7 @@ const initialValues: AccountFormValues = {
   currentBalance: '',
   isActive: 'true',
   notes: '',
-  creditLimit: '',
+  creditLimitCents: '',
   statementClosingDay: '',
   paymentDueDay: '',
 };

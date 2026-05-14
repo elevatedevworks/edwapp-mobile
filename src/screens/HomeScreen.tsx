@@ -1,10 +1,14 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useAuth } from '../auth/AuthProvider';
 import { AppCard } from '../components/AppCard';
 import { Screen } from '../components/Screen';
+import { DrawerScreenProps } from '@react-navigation/drawer';
+import { AppDrawerParamList } from '../navigation/AppDrawer';
 
-export function HomeScreen() {
+type Props = DrawerScreenProps<AppDrawerParamList, 'Home'>;
+
+export function HomeScreen({ navigation }: Props) {
   const { user } = useAuth();
 
   return (
@@ -16,21 +20,22 @@ export function HomeScreen() {
             {user ? `Welcome, ${user.name}` : 'Welcome back'}
           </Text>
         </View>
+        <Pressable onPress={() => navigation.navigate('Finance')}>
+          <AppCard style={styles.card}>
+            <Text style={styles.cardTitle}>Finance</Text>
+            <Text style={styles.cardText}>
+              Your finance module is active. Open the drawer and choose Finance
+              to view bills, payments, accounts, and reminders.
+            </Text>
+          </AppCard>
+        </Pressable>
 
-        <AppCard style={styles.card}>
-          <Text style={styles.cardTitle}>Finance</Text>
-          <Text style={styles.cardText}>
-            Your finance module is active. Open the drawer and choose Finance to
-            view bills, payments, accounts, and reminders.
-          </Text>
-        </AppCard>
-
-        <AppCard style={styles.card}>
+        {/* <AppCard style={styles.card}>
           <Text style={styles.cardTitle}>Life Lessons</Text>
           <Text style={styles.cardText}>
             Coming later: notes, topics, reflections, and lessons learned.
           </Text>
-        </AppCard>
+        </AppCard> */}
       </View>
     </Screen>
   );
