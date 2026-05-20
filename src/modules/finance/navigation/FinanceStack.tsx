@@ -12,6 +12,9 @@ import { PaymentDetailsScreen } from '../screens/PaymentDetailsScreen';
 import { EditPaymentScreen } from '../screens/EditPaymentScreen';
 import { TransactionDetailsScreen } from '../screens/TransactionDetailsScreen';
 import { CreateTransactionScreen } from '../screens/CreateTransactionScreen';
+import { CreateBillInstanceScreen } from '../screens/CreateBillInstanceScreen';
+import { BillInstanceDetailsScreen } from '../screens/BillInstanceDetailsScreen';
+import { TransactionKindOption } from '../constants/transaction.constants';
 
 export type FinanceStackParamList = {
   FinanceTabs: undefined;
@@ -44,7 +47,22 @@ export type FinanceStackParamList = {
   TransactionDetails: {
     transactionId: string;
   };
-  CreateTransaction: undefined;
+  CreateTransaction:
+    | {
+        defaultAccountId?: string | null;
+        billInstanceId?: string | null;
+        amountCents?: number;
+        kind?: TransactionKindOption;
+        description?: string;
+      }
+    | undefined;
+  CreateBillInstance: {
+    billId: string;
+    amountCents?: number;
+  };
+  BillInstanceDetails: {
+    billInstanceId: string;
+  };
 };
 
 const Stack = createNativeStackNavigator<FinanceStackParamList>();
@@ -101,6 +119,17 @@ export function FinanceStack() {
         options={{
           title: 'Create Transaction',
         }}
+      />
+
+      <Stack.Screen
+        name="CreateBillInstance"
+        component={CreateBillInstanceScreen}
+        options={{ title: 'Create Bill Instance' }}
+      />
+      <Stack.Screen
+        name="BillInstanceDetails"
+        component={BillInstanceDetailsScreen}
+        options={{ title: 'Bill Instance Details' }}
       />
     </Stack.Navigator>
   );

@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuthenticatedApi } from '../../../api/useAuthenticatedApi';
 import {
+  BillDetailsResponse,
   BillResponse,
   BillsResponse,
   CreateBillInput,
@@ -23,6 +24,19 @@ export function useBillQuery(billId: string) {
     queryKey: ['finance', 'bills', billId],
     queryFn: () =>
       authenticatedRequest<BillResponse>(`/finance/bills/${billId}`),
+    enabled: Boolean(billId),
+  });
+}
+
+export function useBillDetailsQuery(billId: string) {
+  const { authenticatedRequest } = useAuthenticatedApi();
+
+  return useQuery({
+    queryKey: ['finance', 'bills', billId, 'details'],
+    queryFn: () =>
+      authenticatedRequest<BillDetailsResponse>(
+        `/finance/bills/${billId}/details`,
+      ),
     enabled: Boolean(billId),
   });
 }

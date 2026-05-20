@@ -1,6 +1,5 @@
 import React from 'react';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-
 import { FinanceStackParamList } from '../navigation/FinanceStack';
 import { useCreateTransactionMutation } from '../api/transactions.api';
 import z from 'zod';
@@ -27,6 +26,7 @@ import {
   transactionKindOptions,
   transactionKindSelectOptions,
 } from '../constants/transaction.constants';
+import { AppDatePicker } from '../../../components/AppDatePicker';
 
 type Props = NativeStackScreenProps<FinanceStackParamList, 'CreateTransaction'>;
 
@@ -39,11 +39,19 @@ const createTransactionSchema = z.object({
   transactionDate: z.string().min(1, 'Transaction date is required'),
   description: z.string().min(1, 'Description is required'),
   notes: z.string().optional(),
+  linkedBillInstanceId: z.string().optional(),
 });
 
 type CreateTransactionFormValues = z.infer<typeof createTransactionSchema>;
 
-export function CreateTransactionScreen({ navigation }: Props) {
+export function CreateTransactionScreen({ route, navigation }: Props) {
+  const {
+    defaultAccountId,
+    billInstanceId,
+    amountCents: amountDueCents,
+    kind,
+    description,
+  } = route.params ?? {};
   const createTransactionMutation = useCreateTransactionMutation();
 
   const { data: accountsData, isLoading: isAccountsLoading } =
@@ -59,25 +67,28 @@ export function CreateTransactionScreen({ navigation }: Props) {
     handleSubmit,
     formState: { errors },
     setError,
+    setValue,
     watch,
   } = useForm<CreateTransactionFormValues>({
     resolver: zodResolver(createTransactionSchema),
     defaultValues: {
-      kind: 'expense',
-      accountId: '',
+      kind: kind ? kind : 'expense',
+      accountId: defaultAccountId ?? '',
       counterpartyAccountId: '',
       linkedBillId: '',
-      amount: '',
+      amount: amountDueCents ? (amountDueCents / 100).toFixed(2) : '',
       transactionDate: getTodayDateString(),
-      description: '',
+      description: description ?? '',
       notes: '',
+      linkedBillInstanceId: billInstanceId ?? '',
     },
   });
 
   const selectedTransactionKind = watch('kind');
   const isTransfer = selectedTransactionKind === 'transfer';
-
   const isIncome = selectedTransactionKind === 'income';
+
+  const selectedTransactionDate = watch('transactionDate');
 
   async function onSubmit(values: CreateTransactionFormValues) {
     const amountCents = dollarsToCents(values.amount);
@@ -98,6 +109,7 @@ export function CreateTransactionScreen({ navigation }: Props) {
       transactionDate: values.transactionDate,
       description: values.description,
       notes: values.notes,
+      linkedBillInstanceId: values.linkedBillInstanceId || undefined,
     });
 
     navigation.goBack();
@@ -152,20 +164,17 @@ export function CreateTransactionScreen({ navigation }: Props) {
                 )}
               />
 
-              <Controller
-                control={control}
-                name="transactionDate"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <AppTextInput
-                    label="Transaction Date"
-                    placeholder="YYYY-MM-DD"
-                    autoCapitalize="none"
-                    value={value}
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    error={errors.transactionDate?.message}
-                  />
-                )}
+              <AppDatePicker
+                label="Due Date"
+                value={selectedTransactionDate}
+                placeholder="Select due date"
+                onDateChange={value =>
+                  setValue('transactionDate', value, {
+                    shouldDirty: true,
+                    shouldValidate: true,
+                  })
+                }
+                error={errors.transactionDate?.message}
               />
 
               <Controller

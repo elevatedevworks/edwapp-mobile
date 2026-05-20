@@ -17,6 +17,7 @@ export type Transaction = {
   transactionDate: string;
   description: string;
   notes: string | null;
+  linkedBillInstanceId: string | null;
 };
 
 export type TransactionsResponse = {
@@ -36,4 +37,5 @@ export type CreateTransactionInput = {
   transactionDate: string;
   description: string;
   notes?: string;
+  linkedBillInstanceId?: string | null;
 };
