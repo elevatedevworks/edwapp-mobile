@@ -13,23 +13,23 @@ import { AppCard } from '../../../components/AppCard';
 import { Screen } from '../../../components/Screen';
 import { formatCentsAsCurrency } from '../../../utils/formatCurrency';
 import { formatDisplayDate } from '../../../utils/formatDate';
-import { useBillDetailsQuery } from '../api/bills.api';
 import { FinanceStackParamList } from '../navigation/FinanceStack';
-import { BillInstanceCard } from '../components/BillInstanceCard';
+import { useBillInstanceQuery } from '../api/bill-instances.api';
 
-type Props = NativeStackScreenProps<FinanceStackParamList, 'BillDetails'>;
+type Props = NativeStackScreenProps<
+  FinanceStackParamList,
+  'BillInstanceDetails'
+>;
 
-export function BillDetailsScreen({ route, navigation }: Props) {
-  const { billId } = route.params;
+export function BillInstanceDetailsScreen({ route, navigation }: Props) {
+  const { billInstanceId } = route.params;
   const { data, isLoading, error, refetch, isRefetching } =
-    useBillDetailsQuery(billId);
+    useBillInstanceQuery(billInstanceId);
 
-  const bill = data?.data?.bill;
-  const currentInstance = data?.data?.currentInstance;
-  const previousInstances = data?.data?.previousInstances;
+  const billInstance = data?.data;
 
   return (
-    <Screen headerTitle="Bill Details">
+    <Screen headerTitle="Bill Instance Details">
       <ScrollView
         contentContainerStyle={styles.content}
         refreshControl={
@@ -40,81 +40,67 @@ export function BillDetailsScreen({ route, navigation }: Props) {
           <ActivityIndicator style={styles.loader} />
         ) : error ? (
           <AppCard style={styles.errorBox}>
-            <Text style={styles.errorTitle}>Could not load bill</Text>
+            <Text style={styles.errorTitle}>Could not load bill instance</Text>
             <Text style={styles.errorMessage}>
               {error instanceof Error ? error.message : 'Unknown error'}
             </Text>
             <AppButton title="Try Again" onPress={() => refetch()} />
           </AppCard>
-        ) : bill ? (
+        ) : billInstance ? (
           <>
             <View style={styles.header}>
-              <Text style={styles.title}>{bill.name}</Text>
+              <Text style={styles.title}>{billInstance.notes}</Text>
               <Text style={styles.subtitle}>
-                {bill.vendor ?? 'No vendor'} • {bill.frequency}
+                {billInstance.periodYear} • {billInstance.periodMonth}
               </Text>
             </View>
 
-            {currentInstance ? (
-              <>
-                <AppCard style={styles.amountCard}>
-                  <View style={styles.currentInstance}>
-                    <View style={styles.titleGroup}>
-                      <Text style={styles.label}>Amount Due</Text>
-                      <Text style={styles.amount}>
-                        {currentInstance &&
-                          formatCentsAsCurrency(currentInstance.amountDueCents)}
-                      </Text>
-                      <Text>{currentInstance?.dueDate}</Text>
-                    </View>
-                    <View style={styles.rightGroup}>
-                      <Text
-                        style={[
-                          styles.status,
-                          currentInstance.status === 'paid'
-                            ? styles.paid
-                            : styles.unpaid,
-                        ]}
-                      >
-                        {currentInstance.status}
-                      </Text>
-                    </View>
-                  </View>
-                </AppCard>
-                {bill.accountId ? (
-                  <AppButton
-                    title="Record Payment"
-                    onPress={() =>
-                      navigation.navigate('CreateTransaction', {
-                        billInstanceId: currentInstance.id,
-                        defaultAccountId: bill.accountId,
-                        amountCents: currentInstance.amountDueCents,
-                        kind: 'expense',
-                        description: `Payment for ${bill.name} - ${currentInstance.periodMonth}/${currentInstance.periodYear}`,
-                      })
-                    }
-                  />
-                ) : (
-                  <AppCard style={styles.section}>
-                    <Text style={styles.notes}>
-                      This bill needs an account before a payment can be
-                      recorded
-                    </Text>
-                  </AppCard>
-                )}
-              </>
-            ) : (
+            <AppCard style={styles.amountCard}>
+              <Text style={styles.label}>Amount Due</Text>
+              <Text style={styles.amount}>
+                {formatCentsAsCurrency(billInstance.amountDueCents)}
+              </Text>
+            </AppCard>
+
+            {/* <AppButton
+              title="Edit Bill"
+              onPress={() =>
+                navigation.navigate('EditBill', {
+                  billId: bill.id,
+                })
+              }
+            /> */}
+
+            {/* <AppButton
+              title="Add Bill Instance"
+              onPress={() =>
+                navigation.navigate('CreateBillInstance', {
+                  billId: bill.id,
+                })
+              }
+            /> */}
+
+            {/* {bill.accountId ? (
               <AppButton
-                title="Add Bill Instance"
+                title="Record Payment"
                 onPress={() =>
-                  navigation.navigate('CreateBillInstance', {
+                  navigation.navigate('CreatePayment', {
                     billId: bill.id,
+                    defaultAccountId: bill.accountId!,
+                    amountCents: bill.amountDueCents,
+                    direction: 'outflow',
                   })
                 }
               />
-            )}
+            ) : (
+              <AppCard style={styles.section}>
+                <Text style={styles.notes}>
+                  This bill needs an account before a payment can be recorded
+                </Text>
+              </AppCard>
+            )} */}
 
-            <AppCard style={styles.section}>
+            {/* <AppCard style={styles.section}>
               <Text style={styles.sectionTitle}>Bill Info</Text>
 
               <InfoRow label="Status" value={bill.status} />
@@ -134,34 +120,26 @@ export function BillDetailsScreen({ route, navigation }: Props) {
                 value={bill.accountId ? 'Linked' : 'No account linked'}
               />
               <InfoRow label="Active" value={bill.isActive ? 'Yes' : 'No'} />
-            </AppCard>
-            <AppButton
-              title="Edit Bill"
-              onPress={() =>
-                navigation.navigate('EditBill', {
-                  billId: bill.id,
-                })
-              }
-            />
+            </AppCard> */}
 
-            {bill.notes ? (
+            {billInstance.notes ? (
               <AppCard style={styles.section}>
                 <Text style={styles.sectionTitle}>Notes</Text>
-                <Text style={styles.notes}>{bill.notes}</Text>
+                <Text style={styles.notes}>{billInstance.notes}</Text>
               </AppCard>
             ) : null}
 
-            <Text style={styles.sectionTitle}>Previous</Text>
-
-            {previousInstances?.map(instance => (
-              <BillInstanceCard
-                key={instance.id}
-                billInstance={instance}
-                onPress={() =>
-                  navigation.navigate('BillDetails', { billId: instance.id })
-                }
+            <AppCard style={styles.section}>
+              <Text style={styles.sectionTitle}>Recordkeeping</Text>
+              <InfoRow
+                label="Created"
+                value={formatDisplayDate(billInstance.createdAt)}
               />
-            ))}
+              <InfoRow
+                label="Updated"
+                value={formatDisplayDate(billInstance.updatedAt)}
+              />
+            </AppCard>
           </>
         ) : null}
       </ScrollView>
@@ -208,14 +186,6 @@ const styles = StyleSheet.create({
   amountCard: {
     gap: 6,
   },
-  currentInstance: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 12,
-  },
-  titleGroup: {
-    flex: 1,
-  },
   label: {
     fontSize: 13,
     fontWeight: '700',
@@ -226,9 +196,6 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: '800',
     color: '#0F172A',
-  },
-  rightGroup: {
-    alignItems: 'flex-end',
   },
   section: {
     gap: 12,
@@ -277,22 +244,5 @@ const styles = StyleSheet.create({
   errorMessage: {
     fontSize: 14,
     color: '#7F1D1D',
-  },
-  status: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#334155',
-    marginTop: 4,
-    textTransform: 'capitalize',
-    padding: 5,
-    borderRadius: 10,
-  },
-  unpaid: {
-    color: '#991B1B',
-    backgroundColor: '#FEE2E2',
-  },
-  paid: {
-    color: '#166534',
-    backgroundColor: '#DCFCE7',
   },
 });

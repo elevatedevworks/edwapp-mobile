@@ -1,3 +1,5 @@
+import { BillInstance } from './bill-instances.types';
+
 export type BillFrequency =
   | 'one-time'
   | 'weekly'
@@ -32,6 +34,14 @@ export type BillsResponse = {
 
 export type BillResponse = {
   data: Bill;
+};
+
+export type BillDetailsResponse = {
+  data: {
+    bill: Bill;
+    currentInstance: BillInstance;
+    previousInstances: BillInstance[];
+  };
 };
 
 export type CreateBillInput = {
