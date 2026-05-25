@@ -349,6 +349,7 @@ const styles = StyleSheet.create({
     minHeight: 96,
     textAlignVertical: 'top',
     paddingTop: 14,
+    marginBottom: 15,
   },
   submitButton: {
     marginTop: 48,

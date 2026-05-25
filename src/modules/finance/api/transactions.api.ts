@@ -39,14 +39,19 @@ export function useCreateTransactionMutation() {
         method: 'POST',
         body: values,
       }),
-    onSuccess: async (_data, variables) => {
+    onSuccess: async _data => {
       await Promise.all([
         queryClient.invalidateQueries({
           queryKey: ['finance', 'transactions'],
         }),
-        queryClient.invalidateQueries({ queryKey: ['finance', 'accounts'] }),
         queryClient.invalidateQueries({
-          queryKey: ['finance', 'accounts', variables.accountId],
+          queryKey: ['finance', 'accounts'],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: ['finance', 'bills'],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: ['finance', 'reports'],
         }),
       ]);
     },

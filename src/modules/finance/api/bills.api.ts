@@ -54,7 +54,7 @@ export function useCreateBillMutation() {
     onSuccess: async () => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['finance', 'bills'] }),
-        queryClient.invalidateQueries({ queryKey: ['finance', 'summary'] }),
+        queryClient.invalidateQueries({ queryKey: ['finance', 'reports'] }),
       ]);
     },
   });

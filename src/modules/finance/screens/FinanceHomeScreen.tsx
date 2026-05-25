@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   ActivityIndicator,
+  Pressable,
   RefreshControl,
   ScrollView,
   StyleSheet,
@@ -11,14 +12,25 @@ import { AppButton } from '../../../components/AppButton';
 import { AppCard } from '../../../components/AppCard';
 import { Screen } from '../../../components/Screen';
 import { formatCentsAsCurrency } from '../../../utils/formatCurrency';
-// import { formatDisplayDate } from '../../../utils/formatDate';
 import { useReportsOverviewQuery } from '../api/reports.api';
+import { CompositeScreenProps } from '@react-navigation/native';
+import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
+import { FinanceTabParamList } from '../navigation/FinanceTabs';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { FinanceStackParamList } from '../navigation/FinanceStack';
 
-export function FinanceHomeScreen() {
+type Props = CompositeScreenProps<
+  BottomTabScreenProps<FinanceTabParamList, 'Overview'>,
+  NativeStackScreenProps<FinanceStackParamList>
+>;
+
+export function FinanceHomeScreen({ navigation }: Props) {
   const { data, isLoading, error, refetch, isRefetching } =
     useReportsOverviewQuery();
 
-  const summary = data?.data;
+  const overview = data?.data;
+
+  console.log(overview?.upcomingBills);
 
   return (
     <Screen>
@@ -40,44 +52,44 @@ export function FinanceHomeScreen() {
         ) : error ? (
           <AppCard style={styles.errorBox}>
             <Text style={styles.errorTitle}>
-              Could not load finance summary
+              Could not load finance overview
             </Text>
             <Text style={styles.errorMessage}>
               {error instanceof Error ? error.message : 'Unknown error'}
             </Text>
             <AppButton title="Try Again" onPress={() => refetch()} />
           </AppCard>
-        ) : summary ? (
+        ) : overview ? (
           <>
             <View style={styles.grid}>
               <AppCard style={styles.statCard}>
                 <Text style={styles.statLabel}>Accounts</Text>
-                <Text style={styles.statValue}>{summary.accounts.count}</Text>
+                <Text style={styles.statValue}>{overview.accounts.count}</Text>
                 <Text style={styles.statMeta}>
-                  {formatCentsAsCurrency(summary.accounts.totalBalanceCents)}
+                  {formatCentsAsCurrency(overview.accounts.totalBalanceCents)}
                 </Text>
               </AppCard>
 
               <AppCard style={styles.statCard}>
                 <Text style={styles.statLabel}>Active Bills</Text>
                 <Text style={styles.statValue}>
-                  {summary.bills.activeCount}
+                  {overview.bills.activeCount}
                 </Text>
                 <Text style={styles.statMeta}>
-                  {formatCentsAsCurrency(summary.bills.monthlyTotalCents)} / mo
+                  {formatCentsAsCurrency(overview.bills.monthlyTotalCents)} / mo
                 </Text>
               </AppCard>
 
               <AppCard style={styles.statCard}>
                 <Text style={styles.statLabel}>Cash Flow</Text>
                 <Text style={styles.statValue}>
-                  {formatCentsAsCurrency(summary.cashFlow.netCents)}
+                  {formatCentsAsCurrency(overview.cashFlow.netCents)}
                 </Text>
                 <Text style={styles.statMeta}>
-                  In: {formatCentsAsCurrency(summary.cashFlow.inflowCents)}
+                  In: {formatCentsAsCurrency(overview.cashFlow.inflowCents)}
                 </Text>
                 <Text style={styles.statMeta}>
-                  Out: {formatCentsAsCurrency(summary.cashFlow.outflowCents)}
+                  Out: {formatCentsAsCurrency(overview.cashFlow.outflowCents)}
                 </Text>
               </AppCard>
 
@@ -85,43 +97,56 @@ export function FinanceHomeScreen() {
                 <Text style={styles.statLabel}>Credit Cards</Text>
                 <Text style={styles.statValue}>
                   {formatCentsAsCurrency(
-                    summary.creditCards.totalCurrentCreditBalanceCents,
+                    overview.creditCards.totalCurrentCreditBalanceCents,
                   )}
                 </Text>
                 <Text style={styles.statMeta}>
                   Avail:{' '}
                   {formatCentsAsCurrency(
-                    summary.creditCards.totalAvailableCreditCents,
+                    overview.creditCards.totalAvailableCreditCents,
                   )}
                 </Text>
                 <Text style={styles.statMeta}>
                   {formatCentsAsCurrency(
-                    summary.creditCards.totalAvailableCreditCents,
+                    overview.creditCards.totalAvailableCreditCents,
                   )}
                 </Text>
               </AppCard>
             </View>
 
-            {/* <AppCard style={styles.section}>
-              <Text style={styles.sectionTitle}>Upcoming Reminders</Text>
+            <AppCard style={styles.section}>
+              <Text style={styles.sectionTitle}>Upcoming Bills</Text>
 
-              {summary.reminders.upcoming.length === 0 ? (
-                <Text style={styles.emptyText}>No upcoming reminders.</Text>
+              {overview.upcomingBills.length === 0 ? (
+                <Text style={styles.emptyText}>No upcoming bills.</Text>
               ) : (
-                summary.reminders.upcoming.map(reminder => (
-                  <View key={reminder.id} style={styles.listItem}>
-                    <View style={styles.listText}>
-                      <Text style={styles.itemTitle}>{reminder.title}</Text>
-                      <Text style={styles.itemMeta}>
-                        {formatDisplayDate(reminder.remindAt)}
-                      </Text>
+                overview.upcomingBills.map(bill => (
+                  <Pressable
+                    key={bill.billId}
+                    onPress={() =>
+                      navigation.navigate('BillDetails', {
+                        billId: bill.billId,
+                      })
+                    }
+                  >
+                    <View style={styles.listItem}>
+                      <View style={styles.listText}>
+                        <Text style={styles.itemTitle}>{bill.billName}</Text>
+                        <Text style={styles.itemMeta}>{bill.dueDate}</Text>
+                      </View>
+                      <View style={styles.upcomingStatus}>
+                        <Text style={styles.status}>{bill.status}</Text>
+                        {bill.status === 'unpaid' && (
+                          <Text style={styles.statusAmount}>
+                            {formatCentsAsCurrency(bill.amountDueCents)}
+                          </Text>
+                        )}
+                      </View>
                     </View>
-
-                    <Text style={styles.status}>{reminder.status}</Text>
-                  </View>
+                  </Pressable>
                 ))
               )}
-            </AppCard> */}
+            </AppCard>
 
             {/* <AppCard style={styles.section}>
               <Text style={styles.sectionTitle}>Recent Payments</Text>
@@ -216,6 +241,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '800',
     color: '#0F172A',
+    paddingBottom: 10,
   },
   emptyText: {
     fontSize: 14,
@@ -227,7 +253,7 @@ const styles = StyleSheet.create({
     gap: 12,
     borderTopWidth: 1,
     borderTopColor: '#E2E8F0',
-    paddingTop: 12,
+    paddingVertical: 12,
   },
   listText: {
     flex: 1,
@@ -243,11 +269,17 @@ const styles = StyleSheet.create({
     marginTop: 4,
     textTransform: 'capitalize',
   },
+  upcomingStatus: {
+    alignItems: 'flex-end',
+  },
   status: {
     fontSize: 12,
     fontWeight: '800',
     color: '#334155',
     textTransform: 'capitalize',
+  },
+  statusAmount: {
+    marginTop: 5,
   },
   paymentDirection: {
     fontSize: 12,

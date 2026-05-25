@@ -1,8 +1,12 @@
 import React from 'react';
-import { createDrawerNavigator } from '@react-navigation/drawer';
+import {
+  createDrawerNavigator,
+  DrawerContentComponentProps,
+} from '@react-navigation/drawer';
 import { FinanceStack } from '../modules/finance/navigation/FinanceStack';
 import { HomeScreen } from '../screens/HomeScreen';
 import { SettingsScreen } from '../screens/SettingsScreen';
+import { AppDrawerContent } from './AppDrawerContent';
 
 export type AppDrawerParamList = {
   Home: undefined;
@@ -12,9 +16,14 @@ export type AppDrawerParamList = {
 
 const Drawer = createDrawerNavigator<AppDrawerParamList>();
 
+function renderDrawerContent(props: DrawerContentComponentProps) {
+  return <AppDrawerContent {...props} />;
+}
+
 export function AppDrawer() {
   return (
     <Drawer.Navigator
+      drawerContent={renderDrawerContent}
       screenOptions={{
         headerShown: true,
         drawerActiveTintColor: '#2563EB',

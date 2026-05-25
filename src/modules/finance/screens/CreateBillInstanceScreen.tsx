@@ -28,7 +28,7 @@ export function CreateBillInstanceScreen({ route, navigation }: Props) {
 
   async function handleSubmit(values: BillInstanceFormSubmitValues) {
     console.log(values);
-    const response = await createBillInstanceMutation.mutateAsync({
+    await createBillInstanceMutation.mutateAsync({
       billId,
       periodYear: values.periodYear,
       periodMonth: values.periodMonth,
@@ -37,9 +37,7 @@ export function CreateBillInstanceScreen({ route, navigation }: Props) {
       notes: values.notes,
     });
 
-    navigation.replace('BillInstanceDetails', {
-      billInstanceId: response.data.id,
-    });
+    navigation.goBack();
   }
 
   return (

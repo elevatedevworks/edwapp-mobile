@@ -40,7 +40,7 @@ export function useCreateAccountMutation() {
     onSuccess: async () => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['finance', 'accounts'] }),
-        queryClient.invalidateQueries({ queryKey: ['finance', 'summary'] }),
+        queryClient.invalidateQueries({ queryKey: ['finance', 'reports'] }),
       ]);
     },
   });

@@ -100,6 +100,7 @@ export function LoginScreen() {
               title="Sign In"
               onPress={handleSubmit(onSubmit)}
               isLoading={isSubmitting}
+              style={styles.button}
             />
           </AppCard>
         </ScrollView>
@@ -133,5 +134,8 @@ const styles = StyleSheet.create({
   },
   card: {
     gap: 16,
+  },
+  button: {
+    marginTop: 20,
   },
 });

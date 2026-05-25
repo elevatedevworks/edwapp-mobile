@@ -1,21 +1,12 @@
 import React from 'react';
-import {
-  Keyboard,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableWithoutFeedback,
-  View,
-} from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AppButton } from '../../../components/AppButton';
 import { AppCard } from '../../../components/AppCard';
 import { AppTextInput } from '../../../components/AppTextInput';
-import { Screen } from '../../../components/Screen';
+import { FormScreen } from '../../../components/FormScreen';
 import { dollarsToCents } from '../utils/finance.utils';
 import { AppDatePicker } from '../../../components/AppDatePicker';
 
@@ -131,118 +122,106 @@ export function BillInstanceForm({
   }
 
   return (
-    <Screen>
-      <KeyboardAvoidingView
-        style={styles.keyboardView}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      >
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <ScrollView
-            contentContainerStyle={styles.content}
-            keyboardShouldPersistTaps="handled"
-          >
-            <View style={styles.header}>
-              <Text style={styles.title}>{title}</Text>
-              <Text style={styles.subtitle}>{subtitle}</Text>
-            </View>
+    <FormScreen headerTitle={title}>
+      <View style={styles.header}>
+        <Text style={styles.title}>{title}</Text>
+        <Text style={styles.subtitle}>{subtitle}</Text>
+      </View>
 
-            <AppCard style={styles.card}>
-              <Controller
-                control={control}
-                name="periodMonth"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <AppTextInput
-                    label="Month"
-                    placeholder="1"
-                    keyboardType="number-pad"
-                    value={value}
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    error={errors.periodMonth?.message}
-                  />
-                )}
-              />
+      <AppCard style={styles.card}>
+        <Controller
+          control={control}
+          name="periodMonth"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <AppTextInput
+              label="Month"
+              placeholder="1"
+              keyboardType="number-pad"
+              value={value}
+              onBlur={onBlur}
+              onChangeText={onChange}
+              error={errors.periodMonth?.message}
+            />
+          )}
+        />
 
-              <Controller
-                control={control}
-                name="periodYear"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <AppTextInput
-                    label="Year"
-                    placeholder="1"
-                    keyboardType="number-pad"
-                    value={value}
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    error={errors.periodYear?.message}
-                  />
-                )}
-              />
+        <Controller
+          control={control}
+          name="periodYear"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <AppTextInput
+              label="Year"
+              placeholder="1"
+              keyboardType="number-pad"
+              value={value}
+              onBlur={onBlur}
+              onChangeText={onChange}
+              error={errors.periodYear?.message}
+            />
+          )}
+        />
 
-              <AppDatePicker
-                label="Due Date"
-                value={selectedDueDate}
-                placeholder="Select due date"
-                onDateChange={value =>
-                  setValue('dueDate', value, {
-                    shouldDirty: true,
-                    shouldValidate: true,
-                  })
-                }
-                error={errors.dueDate?.message}
-              />
+        <AppDatePicker
+          label="Due Date"
+          value={selectedDueDate}
+          placeholder="Select due date"
+          onDateChange={value =>
+            setValue('dueDate', value, {
+              shouldDirty: true,
+              shouldValidate: true,
+            })
+          }
+          error={errors.dueDate?.message}
+        />
 
-              <Controller
-                control={control}
-                name="amountDueCents"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <AppTextInput
-                    label="Amount Due"
-                    placeholder="100.00"
-                    keyboardType="decimal-pad"
-                    value={value}
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    error={errors.amountDueCents?.message}
-                  />
-                )}
-              />
+        <Controller
+          control={control}
+          name="amountDueCents"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <AppTextInput
+              label="Amount Due"
+              placeholder="100.00"
+              keyboardType="decimal-pad"
+              value={value}
+              onBlur={onBlur}
+              onChangeText={onChange}
+              error={errors.amountDueCents?.message}
+            />
+          )}
+        />
 
-              <Controller
-                control={control}
-                name="notes"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <AppTextInput
-                    label="Notes"
-                    placeholder="Optional notes"
-                    multiline
-                    value={value}
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    error={errors.notes?.message}
-                    style={styles.notesInput}
-                  />
-                )}
-              />
+        <Controller
+          control={control}
+          name="notes"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <AppTextInput
+              label="Notes"
+              placeholder="Optional notes"
+              multiline
+              value={value}
+              onBlur={onBlur}
+              onChangeText={onChange}
+              error={errors.notes?.message}
+              style={styles.notesInput}
+            />
+          )}
+        />
 
-              {submitError ? (
-                <Text style={styles.errorText}>
-                  {submitError instanceof Error
-                    ? submitError.message
-                    : 'Something went wrong'}
-                </Text>
-              ) : null}
+        {submitError ? (
+          <Text style={styles.errorText}>
+            {submitError instanceof Error
+              ? submitError.message
+              : 'Something went wrong'}
+          </Text>
+        ) : null}
 
-              <AppButton
-                title={submitLabel}
-                onPress={handleSubmit(handleFormSubmit)}
-                isLoading={isSubmitting}
-              />
-            </AppCard>
-          </ScrollView>
-        </TouchableWithoutFeedback>
-      </KeyboardAvoidingView>
-    </Screen>
+        <AppButton
+          title={submitLabel}
+          onPress={handleSubmit(handleFormSubmit)}
+          isLoading={isSubmitting}
+        />
+      </AppCard>
+    </FormScreen>
   );
 }
 
@@ -296,6 +275,7 @@ const styles = StyleSheet.create({
     minHeight: 96,
     textAlignVertical: 'top',
     paddingTop: 14,
+    marginBottom: 60,
   },
   errorText: {
     color: '#991B1B',
