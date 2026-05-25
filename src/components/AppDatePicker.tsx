@@ -116,6 +116,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#334155',
+    marginTop: 10,
   },
   dateButton: {
     minHeight: 52,

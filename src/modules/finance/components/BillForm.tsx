@@ -253,7 +253,7 @@ export function BillForm({
   }
 
   return (
-    <Screen>
+    <Screen headerTitle={title}>
       <KeyboardAvoidingView
         style={styles.keyboardView}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -536,6 +536,8 @@ const styles = StyleSheet.create({
     minHeight: 96,
     textAlignVertical: 'top',
     paddingTop: 14,
+    paddingBottom: 14,
+    marginBottom: 60,
   },
   errorText: {
     color: '#991B1B',

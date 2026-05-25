@@ -165,9 +165,9 @@ export function CreateTransactionScreen({ route, navigation }: Props) {
               />
 
               <AppDatePicker
-                label="Due Date"
+                label="Transaction Date"
                 value={selectedTransactionDate}
-                placeholder="Select due date"
+                placeholder="Select transaction date"
                 onDateChange={value =>
                   setValue('transactionDate', value, {
                     shouldDirty: true,

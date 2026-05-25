@@ -37,7 +37,7 @@ export function TransactionsScreen({ navigation }: Props) {
       >
         <View style={styles.header}>
           <Text style={styles.title}>Transactions</Text>
-          <Text style={styles.subtitle}>Review transactions/</Text>
+          <Text style={styles.subtitle}>Review transactions</Text>
         </View>
 
         <AppButton
@@ -49,7 +49,7 @@ export function TransactionsScreen({ navigation }: Props) {
           <ActivityIndicator style={styles.loader} />
         ) : error ? (
           <AppCard style={styles.errorBox}>
-            <Text style={styles.errorTitle}>Could not load payments</Text>
+            <Text style={styles.errorTitle}>Could not load transactions</Text>
             <Text style={styles.errorMessage}>
               {error instanceof Error ? error.message : 'Unknown error'}
             </Text>
@@ -57,9 +57,9 @@ export function TransactionsScreen({ navigation }: Props) {
           </AppCard>
         ) : transactions.length === 0 ? (
           <AppCard style={styles.emptyBox}>
-            <Text style={styles.emptyTitle}>No payments yet</Text>
+            <Text style={styles.emptyTitle}>No transactions yet</Text>
             <Text style={styles.emptyText}>
-              Payments will show here once they are recorded.
+              Transactions will show here once they are recorded.
             </Text>
           </AppCard>
         ) : (

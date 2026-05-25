@@ -40,7 +40,7 @@ export function useCreatePaymentMutation() {
     onSuccess: async (_data, variables) => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['finance', 'payments'] }),
-        queryClient.invalidateQueries({ queryKey: ['finance', 'summary'] }),
+        queryClient.invalidateQueries({ queryKey: ['finance', 'reports'] }),
         queryClient.invalidateQueries({ queryKey: ['finance', 'bills'] }),
         queryClient.invalidateQueries({
           queryKey: ['finance', 'accounts', variables.accountId],
@@ -75,7 +75,7 @@ export function useUpdatePaymentMutation(paymentId: string) {
         queryClient.invalidateQueries({
           queryKey: ['finance', 'payments', paymentId],
         }),
-        queryClient.invalidateQueries({ queryKey: ['finance', 'summary'] }),
+        queryClient.invalidateQueries({ queryKey: ['finance', 'reports'] }),
         data.data.billId
           ? queryClient.invalidateQueries({
               queryKey: ['finance', 'bills', data.data.billId],

@@ -29,6 +29,18 @@ export type CreditCardSummary = {
   totalCreditLimit: number;
 };
 
+export type UpcomingBills = {
+  billId: string;
+  billName: string;
+  billInstanceId: string | null;
+  dueDate: string;
+  amountDueCents: number;
+  amountPaidCents: number;
+  remainingAmountCents: number;
+  status: string;
+  source: string;
+};
+
 export type PaymentDirection = 'inflow' | 'outflow' | string;
 
 export type RecentPayment = {
@@ -70,6 +82,7 @@ export type ReportsOverviewResponse = {
     bills: BillSummary;
     cashFlow: CashFlowSummary;
     creditCards: CreditCardSummary;
+    upcomingBills: UpcomingBills[];
     // payments: {
     //   recent: RecentPayment[];
     // };

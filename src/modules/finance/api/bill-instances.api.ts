@@ -44,7 +44,8 @@ export function useCreateBillInstanceMutation() {
         queryClient.invalidateQueries({
           queryKey: ['finance', 'bill-instances'],
         }),
-        queryClient.invalidateQueries({ queryKey: ['finance', 'summary'] }),
+        queryClient.invalidateQueries({ queryKey: ['finance', 'reports'] }),
+        queryClient.invalidateQueries({ queryKey: ['finance', 'bills'] }),
       ]);
     },
   });
