@@ -7,11 +7,13 @@ import { FinanceStack } from '../modules/finance/navigation/FinanceStack';
 import { HomeScreen } from '../screens/HomeScreen';
 import { SettingsScreen } from '../screens/SettingsScreen';
 import { AppDrawerContent } from './AppDrawerContent';
+import { DeveloperSettingsScreen } from '../screens/DeveloperSettingsScreen';
 
 export type AppDrawerParamList = {
   Home: undefined;
   Finance: undefined;
   Settings: undefined;
+  DeveloperSettings: undefined;
 };
 
 const Drawer = createDrawerNavigator<AppDrawerParamList>();
@@ -53,6 +55,14 @@ export function AppDrawer() {
         name="Settings"
         component={SettingsScreen}
         options={{ title: 'Settings' }}
+      />
+      <Drawer.Screen
+        name="DeveloperSettings"
+        component={DeveloperSettingsScreen}
+        options={{
+          title: 'Developer Settings',
+          drawerItemStyle: { display: 'none' },
+        }}
       />
     </Drawer.Navigator>
   );

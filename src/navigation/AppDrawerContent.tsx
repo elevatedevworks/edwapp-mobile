@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import {
   DrawerContentComponentProps,
   DrawerContentScrollView,
+  DrawerItem,
   DrawerItemList,
 } from '@react-navigation/drawer';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -13,6 +14,10 @@ export function AppDrawerContent(props: DrawerContentComponentProps) {
   const { user, signOut } = useAuth();
   const insets = useSafeAreaInsets();
 
+  /* Server change */
+  const canAccessDeveloperSettings = user?.role === 'admin';
+  /* Server change */
+
   return (
     <View style={styles.container}>
       <DrawerContentScrollView {...props} contentContainerStyle={styles.scroll}>
@@ -21,6 +26,15 @@ export function AppDrawerContent(props: DrawerContentComponentProps) {
           <Text style={styles.userName}>{user?.name ?? 'Signed in'}</Text>
           <Text style={styles.userEmail}>{user?.email}</Text>
         </View>
+
+        {/* Server change */}
+        {canAccessDeveloperSettings && (
+          <DrawerItem
+            label="Developer Settings"
+            onPress={() => props.navigation.navigate('DeveloperSettings')}
+          />
+        )}
+        {/* Server change */}
 
         <DrawerItemList {...props} />
       </DrawerContentScrollView>

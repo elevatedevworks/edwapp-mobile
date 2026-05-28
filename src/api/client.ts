@@ -1,10 +1,14 @@
-import Config from 'react-native-config';
+/****Server url ******/
 
-export const API_BASE_URL = Config.API_BASE_URL;
+// import Config from 'react-native-config';
 
-if (!API_BASE_URL) {
-  throw new Error('API_BASE_URL is not configured');
-}
+// export const API_BASE_URL = Config.API_BASE_URL;
+
+// if (!API_BASE_URL) {
+//   throw new Error('API_BASE_URL is not configured');
+// }
+
+import { getApiBaseUrl } from '../config/apiEnvironment';
 
 export class ApiError extends Error {
   status: number;
@@ -30,7 +34,20 @@ export async function apiRequest<TResponse>(
 ): Promise<TResponse> {
   const { method = 'GET', body, token } = options;
 
-  const response = await fetch(`${API_BASE_URL}${path}`, {
+  /**** Server url */
+
+  // const response = await fetch(`${API_BASE_URL}${path}`, {
+  //   method,
+  //   headers: {
+  //     'Content-Type': 'application/json',
+  //     ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  //   },
+  //   body: body ? JSON.stringify(body) : undefined,
+  // });
+
+  const baseUrl = await getApiBaseUrl();
+
+  const response = await fetch(`${baseUrl}${path}`, {
     method,
     headers: {
       'Content-Type': 'application/json',
